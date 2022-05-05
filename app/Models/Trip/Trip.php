@@ -2,6 +2,8 @@
 
 namespace App\Models\Trip;
 
+use App\Models\City\City;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -9,8 +11,8 @@ use Illuminate\Database\Eloquent\Model;
  * App\Models\Trip\Trip
  *
  * @property int $id
- * @property string $from
- * @property string $to
+ * @property int $from_id
+ * @property int $to_id
  * @property string $departure_date
  * @property string $arrival_date
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -30,4 +32,24 @@ use Illuminate\Database\Eloquent\Model;
 class Trip extends Model
 {
     use HasFactory;
+
+    public static function new(int $from_id, int $to_id, Carbon $departure_date) :self
+    {
+        return self::create([
+            'from_id' => $from_id,
+            'to_id' => $to_id,
+            'departure_date' => $departure_date,
+            'status' => Status::NEW_STATUS,
+        ]);
+    }
+
+    public function departure()
+    {
+        return $this->hasOne(City::class, 'from_id');
+    }
+
+    public function arrival()
+    {
+        return $this->hasOne(City::class, 'to_id');
+    }
 }

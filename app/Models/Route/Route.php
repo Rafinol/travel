@@ -2,6 +2,7 @@
 
 namespace App\Models\Route;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -12,7 +13,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string $type Air, bus, train, waiting
+ * @property string $type moving, waiting
+ * @property string $transport_type Air, bus, train
  * @property string $sdate
  * @property string $edate
  * @property int|null $price
@@ -39,4 +41,12 @@ use Illuminate\Database\Eloquent\Model;
 class Route extends Model
 {
     use HasFactory;
+
+    public static function boot()
+    {
+        parent::boot();
+        self::saving(function(self $model){
+            $model->duration = $model->edate->getTimestamp()-$model->sdate->getTimestamp();
+        });
+    }
 }

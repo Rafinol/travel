@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * App\Models\Point\Point
  *
+ * @property integer $id
  * @property string $code
  * @property string $name
  * @property string $type

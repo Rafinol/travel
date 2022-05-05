@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('point', function (Blueprint $table) {
             $table->string('code')->primary();
             $table->string('name');
-            $table->string('type');
+            $table->string('type')->comment('bus, air, train, ...');
             $table->string('address');
             $table->string('latitude');
             $table->string('longitude');

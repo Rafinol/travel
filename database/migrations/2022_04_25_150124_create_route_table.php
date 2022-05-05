@@ -15,7 +15,7 @@ return new class extends Migration {
         Schema::create('route', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->string('type')->comment('Air, bus, train, waiting');
+            $table->string('type')->comment('Moving, waiting');
             $table->timestamp('sdate');
             $table->timestamp('edate');
             $table->integer('price')->nullable();

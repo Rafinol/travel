@@ -1,6 +1,7 @@
 <?php
 namespace App\UseCases\Trip;
 
+use App\Exceptions\RoutesNotReadyYetException;
 use App\Http\Request\Trip\TripRequest;
 use App\Models\Trip\Trip;
 use App\UseCases\Trip\Departure\DefaultTripService;
@@ -13,7 +14,22 @@ class TripService
     {
         $trip = Trip::new($request['from_id'], $request['to_id'], $request['date']);
         $service = self::getService($trip->departure->name);
-        var_dump($service->getWays());
+
+    }
+
+    public function getWays(TripRequest $request)
+    {
+        $trip = Trip::where(['departure_date' => $request['date'], 'from_id' => $request['from_id'], 'to_id' => $request['to_id']])->first();
+        if(!$trip){
+            $trip = Trip::new($request['from_id'], $request['to_id'], $request['date']);
+        }
+        $service = self::getService($trip->departure->name);
+        try{
+            return $service->getWays($trip);
+        }
+        catch (RoutesNotReadyYetException $e){
+            return []; //TODO::Выдавать развернутый ответ и записывать в лог
+        }
 
     }
 
@@ -25,5 +41,6 @@ class TripService
         else{
             $service = \App::make(DefaultTripService::class);
         }
+        return $service;
     }
 }

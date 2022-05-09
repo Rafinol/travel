@@ -1,10 +1,65 @@
 <?php
 namespace App\UseCases\Trip\Departure;
 
+use App\Models\Point\Point;
+use App\Models\Route\Route;
+use App\Models\Route\RouteType;
+use App\Models\Transport\TransportType;
+use App\Models\Trip\Trip;
+use App\Models\Way\Way;
+use App\Services\Travel\TravelService;
+use Illuminate\Database\Eloquent\Model;
+
 class KazanTripService implements DepartureService
 {
-    public function getWays() :array
+    private TravelService $service;
+
+    public function __construct(TravelService $service)
     {
-        return [];
+        $this->service = $service;
     }
+
+    public function getWays(Trip $trip) :array
+    {
+        $ways = $trip->ways;
+        if($ways && $this->isCompletedWays($ways)){
+            return $ways;
+        }
+
+        /** Kazan - Destination_point part (only flights) */
+        $way = Way::new($trip->id, 'Just Flights');
+        $flight_results = $this->service->getRoutes($way);
+        $routes = [];
+        foreach ($flight_results as $key => $flights){
+            foreach ($flights['flights'] as $flight){
+                $from_point = Point::findOrNew($flight->departure_point)->save();
+                $to_point = Point::findOrNew($flight->departure_point)->save();
+                $route = new Route();
+                $route->type = RouteType::MOVING_TYPE;
+                $route->price = $flights['price']/count($flights['flights']);
+                $route->sdate = $flight->departure_date;
+                $route->edate = $flight->arrival_date;
+                $route->way_id = $way->id;
+                $route->transport_type = TransportType::AIR_TYPE;
+                $route->from_id = $flight->departure_point;
+                $route->to_id = $flight->arrival_point;
+                $route->index = $key;
+                $route->save();
+                $routes[] = $route;
+            }
+        }
+        $way->changeStatusToCompleted();
+        return $routes;
+    }
+
+    private function isCompletedWays(array $ways){
+        foreach ($ways as $way){
+            if(!$way->isCompleted()){
+                return false;
+            }
+        }
+        return true;
+    }
+
+
 }

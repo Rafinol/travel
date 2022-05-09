@@ -3,6 +3,7 @@
 namespace App\Models\Trip;
 
 use App\Models\City\City;
+use App\Models\Way\Way;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -33,6 +34,8 @@ class Trip extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['from_id', 'to_id', 'departure_date', 'status'];
+
     public static function new(int $from_id, int $to_id, Carbon $departure_date) :self
     {
         return self::create([
@@ -45,11 +48,16 @@ class Trip extends Model
 
     public function departure()
     {
-        return $this->hasOne(City::class, 'from_id');
+        return $this->hasOne(City::class, 'id', 'from_id');
     }
 
     public function arrival()
     {
-        return $this->hasOne(City::class, 'to_id');
+        return $this->hasOne(City::class, 'id', 'to_id');
+    }
+
+    public function ways()
+    {
+        return $this->hasMany(Way::class);
     }
 }

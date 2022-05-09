@@ -24,4 +24,11 @@ class City extends Model
         }
         return $point->first();
     }
+
+    public function updateForeignId(string $sid) :self
+    {
+        $this->yandex_id = $sid;
+        $this->save();
+        return $this;
+    }
 }

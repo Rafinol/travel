@@ -32,8 +32,8 @@ class KazanTripService implements DepartureService
         $routes = [];
         foreach ($flight_results as $key => $flights){
             foreach ($flights['flights'] as $flight){
-                $from_point = Point::findOrNew($flight->departure_point)->save();
-                $to_point = Point::findOrNew($flight->departure_point)->save();
+                $from_point = Point::findOrNew($flight->departure_point->code, ['name' => $flight->departure_point->name])->save();
+                $to_point = Point::findOrNew($flight->arrival_point->code, ['name' => $flight->arrival_point->name])->save();
                 $route = new Route();
                 $route->type = RouteType::MOVING_TYPE;
                 $route->price = $flights['price']/count($flights['flights']);
@@ -41,11 +41,11 @@ class KazanTripService implements DepartureService
                 $route->edate = $flight->arrival_date;
                 $route->way_id = $way->id;
                 $route->transport_type = TransportType::AIR_TYPE;
-                $route->from_id = $flight->departure_point;
-                $route->to_id = $flight->arrival_point;
+                $route->from_id = $from_point->code;
+                $route->to_id = $to_point->code;
                 $route->index = $key;
                 $route->save();
-                $routes[] = $route;
+                $routes[$way->id][$key][] = $route;
             }
         }
         $way->changeStatusToCompleted();

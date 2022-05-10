@@ -7,6 +7,7 @@ namespace App\Services\Travel;
 use App\Exceptions\RoutesNotReadyYetException;
 use App\Models\City\City;
 use App\Models\Flight\Flight;
+use App\Models\Point\Station;
 use App\Models\Trip\Trip;
 use App\Models\Way\Way;
 use App\Models\Way\WaySearch;
@@ -106,8 +107,10 @@ class YandexFlightTravelService implements TravelService
                 $flight->departure_date = $reference_flights[$value]['departure']['local'];
                 $flight->arrival_date = $reference_flights[$value]['arrival']['local'];
                 $flight->flight_number = $reference_flights[$value]['number'];
-                $flight->departure_point = $stations[$reference_flights[$value]['from']]['code'];
-                $flight->arrival_point = $stations[$reference_flights[$value]['to']]['code'];
+                $station_from = $stations[$reference_flights[$value]['from']];
+                $flight->departure_point = new Station($station_from['code'], $station_from['title']);
+                $station_to = $stations[$reference_flights[$value]['to']];
+                $flight->arrival_point = new Station($station_to['code'], $station_to['title']);
                 }, $value['route'][0]);
 
             return [

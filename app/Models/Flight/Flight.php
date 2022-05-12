@@ -1,14 +1,15 @@
 <?php
-
-
 namespace App\Models\Flight;
 
+use App\Models\Point\Point;
+use App\Models\Point\Station;
+use Carbon\Carbon;
 
 class Flight
 {
-    public $flight_number;
-    public $departure_date;
-    public $arrival_date;
-    public $departure_point;
-    public $arrival_point;
+    public string $flight_number;
+    public Carbon $departure_date;
+    public Carbon $arrival_date;
+    public Station $departure_point;
+    public Station $arrival_point;
 }

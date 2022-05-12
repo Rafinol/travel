@@ -37,16 +37,24 @@ use Illuminate\Database\Eloquent\Model;
  * @mixin \Eloquent
  * @property int $way_id
  * @method static \Illuminate\Database\Eloquent\Builder|Route whereWayId($value)
+ * @property int $index
+ * @method static \Database\Factories\Route\RouteFactory factory(...$parameters)
+ * @method static \Illuminate\Database\Eloquent\Builder|Route whereIndex($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Route whereTransportType($value)
+ * @property int|null $part_way_id
+ * @method static \Illuminate\Database\Eloquent\Builder|Route wherePartWayId($value)
  */
 class Route extends Model
 {
     use HasFactory;
 
+    protected $dates = ['sdate', 'edate'];
+
     public static function boot()
     {
         parent::boot();
         self::saving(function(self $model){
-            $model->duration = $model->edate->getTimestamp()-$model->sdate->getTimestamp();
+            $model->duration = $model->edate->timestamp-$model->sdate->timestamp;
         });
     }
 }

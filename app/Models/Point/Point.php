@@ -29,8 +29,13 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Point whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Point whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property int|null $city_id
+ * @method static \Database\Factories\Point\PointFactory factory(...$parameters)
+ * @method static \Illuminate\Database\Eloquent\Builder|Point whereCityId($value)
  */
 class Point extends Model
 {
     use HasFactory;
+
+    protected $fillable = ['code', 'name', 'type', 'address', 'latitude', 'longitude'];
 }

@@ -28,10 +28,17 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Way whereTripId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Way whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Way\PartWay[] $part_way
+ * @property-read int|null $part_way_count
+ * @property-read Trip $trip
+ * @method static \Database\Factories\Way\WayFactory factory(...$parameters)
+ * @method static \Illuminate\Database\Eloquent\Builder|Way whereStatus($value)
  */
 class Way extends Model
 {
     use HasFactory;
+
+    protected $fillable = ['trip_id', 'name', 'status', ];
 
     public static function new(int $trip_id, string $name) :self
     {
@@ -40,6 +47,22 @@ class Way extends Model
             'name' => $name,
             'status' => WayStatus::NEW_STATUS
         ]);
+    }
+
+    public function isCreated()
+    {
+        if($this->status == WayStatus::NEW_STATUS){
+            return true;
+        }
+        return false;
+    }
+
+    public function isWaiting()
+    {
+        if($this->status == WayStatus::WAITING_STATUS){
+            return true;
+        }
+        return false;
     }
 
     public function isCompleted()
@@ -52,7 +75,12 @@ class Way extends Model
 
     public function trip()
     {
-        return $this->hasOne(Trip::class);
+        return $this->belongsTo(Trip::class);
+    }
+
+    public function part_way()
+    {
+        return $this->hasMany(PartWay::class)->orderBy('position');
     }
 
     public function changeStatusToWaiting()
@@ -65,5 +93,14 @@ class Way extends Model
     {
         $this->status = WayStatus::DONE_STATUS;
         $this->save();
+    }
+
+    public static function firstOrNew(int $trip_id, string $name)
+    {
+        $way = self::where(['trip_id' => $trip_id, 'name' => $name])->first();
+        if(!$way){
+            $way = self::new($trip_id, $name);
+        }
+        return $way;
     }
 }

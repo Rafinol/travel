@@ -4,7 +4,8 @@ namespace App\Console\Commands;
 
 use App\Http\Request\Trip\TripRequest;
 use App\Models\City\City;
-use App\Services\Travel\TravelService;
+use App\Services\Travel\FlightTravelService;
+use App\UseCases\Trip\Departure\DepartureService;
 use App\UseCases\Trip\TripService;
 use Illuminate\Console\Command;
 
@@ -29,16 +30,15 @@ class GetTravelWays extends Command
      *
      * @return int
      */
-    public function handle(TripService $service)
+    public function handle(DepartureService $service)
     {
         $request = new TripRequest();
-        $request['from_id'] = City::where(['name' => $this->argument('from')])->first();
-        $request['to_id'] = City::where(['name' => $this->argument('to')])->first();
+        $request['from_id'] = City::where(['name' => $this->argument('from')])->firstOrFail()->id;
+        $request['to_id'] = City::where(['name' => $this->argument('to')])->firstOrFail()->id;
         $request['date'] = $this->argument('date');
+        $request->validate($request->rules());
 
-        $request->validate();
-
-        $ways = $service->getWays($request);
-        $this->info(json_encode($ways));
+        $trip = $service->getTrip($request);
+        $this->info(json_encode($trip));
     }
 }

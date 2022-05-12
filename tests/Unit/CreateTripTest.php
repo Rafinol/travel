@@ -4,7 +4,7 @@ namespace Tests\Unit;
 use App\Http\Request\Trip\TripRequest;
 use App\Models\City\City;
 use App\UseCases\Trip\Departure\DefaultTripService;
-use App\UseCases\Trip\Departure\KazanTripService;
+use App\UseCases\Trip\Departure\CustomTripService;
 use App\UseCases\Trip\TripService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -31,7 +31,7 @@ class CreateTripTest extends TestCase
         $trip_service->create($trip_request);
         $service = TripService::getService($from_city->name);
         if($from_city->name == 'Kazan'){
-            $this->assertInstanceOf(KazanTripService::class, $service);
+            $this->assertInstanceOf(CustomTripService::class, $service);
         }
         else{
             $this->assertInstanceOf(DefaultTripService::class, $service);

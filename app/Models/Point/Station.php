@@ -6,8 +6,8 @@ namespace App\Models\Point;
 
 class Station
 {
-    public $code;
-    public $name;
+    public string $code;
+    public string $name;
 
     public function __construct(string $code, string $name)
     {

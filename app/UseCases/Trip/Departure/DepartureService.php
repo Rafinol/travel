@@ -8,4 +8,6 @@ use Illuminate\Database\Eloquent\Collection;
 interface DepartureService
 {
     public function getTrip(TripRequest $request) :Trip;
+
+    public function search(Trip $trip) :void;
 }

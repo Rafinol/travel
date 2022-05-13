@@ -2,9 +2,9 @@
 namespace App\Services\Travel\Agregators;
 
 
-use App\Models\Flight\Flight;
-use App\Models\Flight\FlightResult;
-use App\Models\Point\Station;
+use App\Models\RouteDto\RouteDto;
+use App\Models\RouteDto\ResultRouteDto;
+use App\Models\Point\StationDto;
 use JetBrains\PhpStorm\Pure;
 
 class YandexFlight
@@ -30,27 +30,27 @@ class YandexFlight
             foreach ($fare['route'[0]] as $route_key){
                 $routes[] = $this->create($route_key);
             }
-            $flights[] = new FlightResult($this->getMinFlightPrice($fare['prices']), $routes);
+            $flights[] = new ResultRouteDto($this->getMinFlightPrice($fare['prices']), $routes);
         }
         return $flights;
     }
 
-    #[Pure] public function create(string $route_key) :Flight
+    #[Pure] public function create(string $route_key) :RouteDto
     {
         $fr = $this->flights[$route_key]; //flight route
-        $flight = new Flight();
+        $flight = new RouteDto();
         $flight->departure_date = $fr['departure']['local'];
         $flight->arrival_date = $fr['arrival']['local'];
-        $flight->flight_number = $fr['number'];
+        $flight->number = $fr['number'];
         $flight->departure_point = $this->getStation($fr['from']);
         $flight->arrival_point = $this->getStation($fr['to']);
         return $flight;
     }
 
-    #[Pure] private function getStation($id) :Station
+    #[Pure] private function getStation($id) :StationDto
     {
         $station = $this->stations[$id];
-        return new Station($station['code'], $station['title']);
+        return new StationDto($station['code'], $station['title']);
     }
 
     private function getMinFlightPrice(array $values) :int

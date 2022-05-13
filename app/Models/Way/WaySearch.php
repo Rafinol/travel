@@ -26,6 +26,8 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|WaySearch whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|WaySearch whereWayId($value)
  * @mixin \Eloquent
+ * @property int $part_way_id
+ * @method static \Illuminate\Database\Eloquent\Builder|WaySearch wherePartWayId($value)
  */
 class WaySearch extends Model
 {

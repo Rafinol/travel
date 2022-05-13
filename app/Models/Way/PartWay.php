@@ -4,6 +4,7 @@ namespace App\Models\Way;
 
 use App\Models\City\City;
 use App\Models\Route\Route;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -13,8 +14,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id
  * @property int $way_id
  * @property int $position
- * @property string|null $departure_date
- * @property string|null $arrival_date
+ * @property Carbon $departure_date
+ * @property Carbon $arrival_date
  * @property int $from_id
  * @property int $to_id
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -42,6 +43,8 @@ use Illuminate\Database\Eloquent\Model;
 class PartWay extends Model
 {
     use HasFactory;
+
+    protected $dates = ['departure_date', 'arrival_date'];
 
     public static function new($from_id, $to_id, $way_id, $position) :self
     {

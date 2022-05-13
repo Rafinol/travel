@@ -4,7 +4,7 @@
 namespace App\Models\Point;
 
 
-class Station
+class StationDto
 {
     public string $code;
     public string $name;

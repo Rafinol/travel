@@ -6,5 +6,5 @@ namespace App\UseCases\Trip\Type;
 
 abstract class BusTripService
 {
-
+    use TripTrait;
 }

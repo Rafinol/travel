@@ -80,15 +80,22 @@ class Trip extends Model
         return false;
     }
 
-    public function changeStatusToWaiting()
+    public function isSearching()
     {
-        $this->status = WayStatus::WAITING_STATUS;
+        if($this->status == Status::SEARCHING_STATUS)
+            return true;
+        return false;
+    }
+
+    public function changeStatusToSearching()
+    {
+        $this->status = Status::WAITING_STATUS;
         $this->save();
     }
 
     public function changeStatusToCompleted()
     {
-        $this->status = WayStatus::DONE_STATUS;
+        $this->status = Status::DONE_STATUS;
         $this->save();
     }
 }

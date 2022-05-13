@@ -39,6 +39,7 @@ class GetTravelWays extends Command
         $request->validate($request->rules());
 
         $trip = $service->getTrip($request);
+        $service->search($trip);
         $this->info(json_encode($trip));
     }
 }

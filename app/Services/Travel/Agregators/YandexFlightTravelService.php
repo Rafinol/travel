@@ -7,9 +7,9 @@ namespace App\Services\Travel\Agregators;
 use App\Exceptions\RoutesAlreadyDoneException;
 use App\Exceptions\RoutesNotReadyYetException;
 use App\Models\City\City;
-use App\Models\Flight\Flight;
-use App\Models\Flight\FlightResult;
-use App\Models\Point\Station;
+use App\Models\RouteDto\RouteDto;
+use App\Models\RouteDto\ResultRouteDto;
+use App\Models\Point\StationDto;
 use App\Models\Trip\Trip;
 use App\Models\Way\PartWay;
 use App\Models\Way\Way;
@@ -32,12 +32,9 @@ class YandexFlightTravelService implements FlightTravelService
         return self::SERVICE_NAME;
     }
 
-    public function search(PartWay $part_way) :void
+    public function search(PartWay $part_way) :string
     {
-        $way_search = WaySearch::new($part_way->id, $this->getServiceName());
-        $search_id = $this->createSearch($part_way->departure, $part_way->arrival, $part_way->departure_date);
-        $way_search->changeStatusToWaiting();
-        $way_search->update(['search_id'=> $search_id]);
+        return $this->createSearch($part_way->departure, $part_way->arrival, $part_way->departure_date);
     }
 
     private function createSearch(City $from, City $to, $date) :string
@@ -73,18 +70,9 @@ class YandexFlightTravelService implements FlightTravelService
         return $result['items'][0]['pointKey'];
     }
 
-    public function getRoutes(PartWay $part_way): array
+    public function getRoutes(WaySearch $way_search): array
     {
-        $way_search = WaySearch::where(['type' => $this->getServiceName(), 'way_id' => $part_way->id,])->where('created_at', '>', now()->subDay())->first();
-        if($way_search->isWaiting()){
-            throw new RoutesNotReadyYetException();
-        }
-        if($way_search->isDone()){
-            throw new RoutesAlreadyDoneException();
-        }
-        $result = $this->getResults($way_search->search_id);
-        $way_search->changeStatusToDone();
-        return $result;
+        return $this->getResults($way_search->search_id);
     }
 
     private function getResults(string $search_id) :array
@@ -94,7 +82,7 @@ class YandexFlightTravelService implements FlightTravelService
             'cont' => 0,
             'allowPortional' => 1,
         ];
-        $response = Http::get(self::GET_RESULT_URL, $params);
+        $response = Http::retry(3, 10000)->get(self::GET_RESULT_URL, $params);
         if(!$response){
             throw new \DomainException('travels not found:(');
         }

@@ -37,9 +37,8 @@ class GetTravelWays extends Command
         $request['to_id'] = City::where(['name' => $this->argument('to')])->firstOrFail()->id;
         $request['date'] = $this->argument('date');
         $request->validate($request->rules());
-
         $trip = $service->getTrip($request);
         $service->search($trip);
-        $this->info(json_encode($trip));
+        $this->info(json_encode($trip->ways));
     }
 }

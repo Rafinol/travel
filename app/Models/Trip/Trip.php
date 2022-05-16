@@ -89,7 +89,7 @@ class Trip extends Model
 
     public function changeStatusToSearching()
     {
-        $this->status = Status::WAITING_STATUS;
+        $this->status = Status::SEARCHING_STATUS;
         $this->save();
     }
 

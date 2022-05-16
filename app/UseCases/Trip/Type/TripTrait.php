@@ -4,29 +4,37 @@
 namespace App\UseCases\Trip\Type;
 
 
+use App\Models\Route\RouteSearchForm;
 use App\Models\Way\PartWay;
-use App\Models\Way\WaySearch;
+use App\Models\Route\RouteSearch;
+use App\Models\Route\RouteSearchStatus;
 use App\Services\Travel\FlightTravelService;
 
 trait TripTrait
 {
-    public function search(PartWay $part_way) :void
+    public function search(RouteSearchForm $route_search) :void
     {
-        $way_search = WaySearch::where(['type' => $this->service->getServiceName(), 'way_id' => $part_way->id,])->where('created_at', '>', now()->subDay())->first();
+        $way_search = RouteSearch::where(['type' => $this->service->getServiceName(), 'route_search_form_id' => $route_search->id,])->where('created_at', '>', now()->subDay())->first();
         if(!$way_search) {
-            $way_search = WaySearch::new($part_way->id, $this->service->getServiceName());
+            $way_search = RouteSearch::new($route_search->id, $this->service->getServiceName());
         }
-        if($way_search->isDone()){
+        if($way_search->isDone() || $way_search->isWaiting()){
             return;
         }
-        $search_id = $this->service->search($part_way);
-        $way_search->update(['search_id'=> $search_id]);
+        $search_id = $this->service->search($route_search);
+        $way_search->update(['search_id'=> $search_id, 'status' => RouteSearchStatus::WAITING_STATUS]);
     }
 
-    public function getRoutes(PartWay $part_way) :array
+    public function getRoutes(RouteSearchForm $route_search_form) :array
     {
-        $way_search = WaySearch::where(['type' => $this->service->getServiceName(), 'part_way_id' => $part_way->id,])->first();
-        return $this->service->getRoutes($way_search);
+        $route_search = RouteSearch::where(['type' => $this->service->getServiceName(), 'route_search_form_id' => $route_search_form->id,])->first();
+        return $this->service->getRoutes($route_search);
+    }
+
+    public function changeRouteSearchStatusToDone(RouteSearchForm $route_search_form) :void
+    {
+        $route_search = RouteSearch::where(['type' => $this->service->getServiceName(), 'route_search_form_id' => $route_search_form->id,])->first();
+        $route_search->changeStatusToDone();
     }
 
 }

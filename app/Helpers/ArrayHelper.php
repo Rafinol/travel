@@ -12,7 +12,7 @@ class ArrayHelper
             return $array;
         $result = [];
         foreach ($array as $i => $item){
-            if($i < count($array)){
+            if($i < count($array)-1){
                 $result[] = [$item, $array[$i+1]];
             }
         }

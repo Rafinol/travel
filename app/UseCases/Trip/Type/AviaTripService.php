@@ -13,11 +13,11 @@ use App\Models\Transport\TransportType;
 use App\Models\Trip\Trip;
 use App\Models\Way\PartWay;
 use App\Models\Way\Way;
-use App\Models\Way\WaySearch;
+use App\Models\Way\RouteSearch;
 use App\Services\Travel\FlightTravelService;
 use Illuminate\Database\Eloquent\Model;
 
-abstract class AviaTripService
+class AviaTripService
 {
     use TripTrait;
     private FlightTravelService $service;

@@ -7,13 +7,14 @@ namespace App\Services\Travel\Agregators;
 use App\Exceptions\RoutesAlreadyDoneException;
 use App\Exceptions\RoutesNotReadyYetException;
 use App\Models\City\City;
+use App\Models\Route\RouteSearch;
+use App\Models\Route\RouteSearchForm;
 use App\Models\RouteDto\RouteDto;
 use App\Models\RouteDto\ResultRouteDto;
 use App\Models\Point\StationDto;
 use App\Models\Trip\Trip;
 use App\Models\Way\PartWay;
 use App\Models\Way\Way;
-use App\Models\Way\WaySearch;
 use App\Services\Travel\FlightTravelService;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
@@ -32,9 +33,9 @@ class YandexFlightTravelService implements FlightTravelService
         return self::SERVICE_NAME;
     }
 
-    public function search(PartWay $part_way) :string
+    public function search(RouteSearchForm $route_search_form) :string
     {
-        return $this->createSearch($part_way->departure, $part_way->arrival, $part_way->departure_date);
+        return $this->createSearch($route_search_form->departure, $route_search_form->arrival, $route_search_form->departure_date);
     }
 
     private function createSearch(City $from, City $to, $date) :string
@@ -46,7 +47,7 @@ class YandexFlightTravelService implements FlightTravelService
         $body = [
             'fromId' => $from->yandex_id,
             'toId' => $to->yandex_id,
-            'when' => $date,
+            'when' => $date->format('Y-m-d'),
             'adult_seats' => 1,
             'children_seats' => 0,
             'infant_seats' => 0,
@@ -57,7 +58,7 @@ class YandexFlightTravelService implements FlightTravelService
         return $result['id'];
     }
 
-    private function getCityId(string $city_name) :int
+    private function getCityId(string $city_name) :string
     {
         $result = Http::get(self::GET_CITY_URL, [
             'field' => 'from',
@@ -67,12 +68,13 @@ class YandexFlightTravelService implements FlightTravelService
             'showCountries' => 0,
             'showAnywhere' => 0,
         ]);
+        $json = $result->json();
         return $result['items'][0]['pointKey'];
     }
 
-    public function getRoutes(WaySearch $way_search): array
+    public function getRoutes(RouteSearch $route_search): array
     {
-        return $this->getResults($way_search->search_id);
+        return $this->getResults($route_search->search_id);
     }
 
     private function getResults(string $search_id) :array
@@ -86,7 +88,7 @@ class YandexFlightTravelService implements FlightTravelService
         if(!$response){
             throw new \DomainException('travels not found:(');
         }
-        $ya_flights = new YandexFlight($response->object());
+        $ya_flights = new YandexFlight($response->json());
         return $ya_flights->getFlights();
     }
 }

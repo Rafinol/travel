@@ -5,6 +5,7 @@ namespace App\Services\Travel\Agregators;
 use App\Models\RouteDto\RouteDto;
 use App\Models\RouteDto\ResultRouteDto;
 use App\Models\Point\StationDto;
+use Carbon\Carbon;
 use JetBrains\PhpStorm\Pure;
 
 class YandexFlight
@@ -27,7 +28,7 @@ class YandexFlight
         $flights = [];
         foreach($this->fares as $fare){
             $routes = [];
-            foreach ($fare['route'[0]] as $route_key){
+            foreach ($fare['route'][0] as $route_key){
                 $routes[] = $this->create($route_key);
             }
             $flights[] = new ResultRouteDto($this->getMinFlightPrice($fare['prices']), $routes);
@@ -39,8 +40,8 @@ class YandexFlight
     {
         $fr = $this->flights[$route_key]; //flight route
         $flight = new RouteDto();
-        $flight->departure_date = $fr['departure']['local'];
-        $flight->arrival_date = $fr['arrival']['local'];
+        $flight->departure_date = Carbon::parse($fr['departure']['local']);
+        $flight->arrival_date = Carbon::parse($fr['arrival']['local']);
         $flight->number = $fr['number'];
         $flight->departure_point = $this->getStation($fr['from']);
         $flight->arrival_point = $this->getStation($fr['to']);

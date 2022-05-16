@@ -4,6 +4,7 @@ namespace App\Models\Way;
 
 use App\Models\City\City;
 use App\Models\Route\Route;
+use App\Models\Route\RouteSearchForm;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -46,9 +47,10 @@ class PartWay extends Model
 
     protected $dates = ['departure_date', 'arrival_date'];
 
+
     public static function new($from_id, $to_id, $way_id, $position) :self
     {
-        $part_way = self();
+        $part_way = new self();
         $part_way->from_id = $from_id;
         $part_way->to_id = $to_id;
         $part_way->way_id = $way_id;
@@ -67,8 +69,13 @@ class PartWay extends Model
         return $this->hasOne(City::class, 'id', 'to_id');
     }
 
-    public function routes()
+    public function routeSearchForm()
     {
-        return $this->hasMany(Route::class);
+        return $this->belongsTo(RouteSearchForm::class);
     }
+
+    /*public function routes()
+    {
+        return $this->routeSearchForm();
+    }*/
 }

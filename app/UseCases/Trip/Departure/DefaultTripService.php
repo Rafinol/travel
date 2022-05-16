@@ -1,8 +1,5 @@
 <?php
-
-
 namespace App\UseCases\Trip\Departure;
-
 
 use App\Helpers\ArrayHelper;
 use App\Http\Request\Trip\TripRequest;
@@ -10,23 +7,26 @@ use App\Models\City\City;
 use App\Models\Point\Point;
 use App\Models\Point\PointType;
 use App\Models\Route\Route;
+use App\Models\Route\RouteSearchForm;
 use App\Models\Route\RouteType;
 use App\Models\Transport\TransportType;
 use App\Models\Trip\Status;
 use App\Models\Trip\Trip;
 use App\Models\Way\PartWay;
 use App\Models\Way\Way;
-use App\Models\Way\WaySearch;
 use App\UseCases\Trip\Type\BusTripService;
 use App\UseCases\Trip\Type\AviaTripService;
 use App\UseCases\Trip\Type\TrainTripService;
-use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class DefaultTripService implements DepartureService
 {
     protected AviaTripService $avia;
     protected TrainTripService $train;
     protected BusTripService $bus;
+
+    const SLEEP_TIME = 10;
 
     public array $routes = []; //Additional intermediate routes to search
 
@@ -52,6 +52,7 @@ class DefaultTripService implements DepartureService
         if($trip->isCompleted() || $trip->isSearching()){
             return $trip;
         }
+        $this->checkExistCities();
         array_map(function($route) use ($trip){
             $way = Way::new($trip->id, implode(' - ',$route));
             foreach (ArrayHelper::splitOfPairs($route) as $key => $pair){
@@ -59,17 +60,22 @@ class DefaultTripService implements DepartureService
                 $to_from = City::where(['name' => $pair[1]])->first();
                 PartWay::new($city_from->id, $to_from->id, $way->id, $key);
             }
-        }, $this->prepareRouteArray($request));
+        }, $this->prepareRouteArray($trip));
         $trip->changeStatusToSearching();
         return $trip;
     }
 
-    private function prepareRouteArray(TripRequest $request) :array
+    private function prepareRouteArray(Trip $trip) :array
     {
-        $routes = array_map(function($value) use ($request){
-            return array_merge($request['from'], $value, $request['to']); // Add the beginning and end of the route to each element of the array
+        $routes = array_map(function($value) use ($trip){
+            array_unshift($value, $trip->departure->name);
+            if(last($value) != $trip->arrival->name) {
+                array_push($value, $trip->arrival->name);
+            }
+            return $value; // Add the beginning and end of the route to each element of the array
         }, $this->routes);
-        return array_merge([$request['from'], $request['to']],$routes);
+        array_unshift($routes, [$trip->departure->name, $trip->arrival->name]);
+        return $routes;
     }
 
     /*public function search(Trip $trip) :void
@@ -78,6 +84,21 @@ class DefaultTripService implements DepartureService
         //$this->train->getWays($trip),
         //$this->bus->getWays($trip),
     }*/
+
+
+    private function checkExistCities() :void
+    {
+        $cities = [];
+        foreach ($this->routes as $route){
+            foreach($route as $city){
+                $cities[] = $city;
+            }
+        }
+        $unique_cities  = array_unique($cities);
+        if(count($unique_cities) != City::whereIn('name' , $unique_cities)->count()){
+            throw new NotFoundHttpException('Some cities not found');
+        }
+    }
 
     public function search(Trip $trip) :void
     {
@@ -105,46 +126,48 @@ class DefaultTripService implements DepartureService
             else{
                 $part_way->departure_date = $way->part_way[$part_way->position-1]->arrival_date;
             }
-            $this->requestAndSave($part_way);
-            $part_way->arrival_date = collect($part_way->routes)->min('edate');
+            $route_search_form = RouteSearchForm::firstOrCreate(['from_id' => $part_way->from_id, 'to_id' => $part_way->to_id, 'departure_date' => Carbon::parse($part_way->departure_date)->startOfDay()]);
+            $part_way->route_search_form_id = $route_search_form->id;
+            $this->requestAndSave($route_search_form);
+            $part_way->arrival_date = collect($part_way->routeSearchForm->routes)->min('edate');
             $part_way->save();
         }
     }
 
-    public function requestAndSave(PartWay $part_way) :void //Extendable
+    public function requestAndSave(RouteSearchForm $route_search_form) :void //Extendable
     {
-        $this->avia->search($part_way);
-        sleep(10);
-        $routes = $this->avia->getRoutes($part_way);
-        $this->saveRoutes($part_way, $routes);
+        $this->avia->search($route_search_form);
+        sleep(self::SLEEP_TIME);
+        $routes = $this->avia->getRoutes($route_search_form);
+        $this->saveRoutes($route_search_form, $routes);
+        $this->avia->changeRouteSearchStatusToDone($route_search_form);
 
-        /* You can also use other services such as bus or train. When it will be reade :)
-         * $this->bus->search($part_way);
-        $routes = $this->bus->getRoutes($part_way);
-        $this->saveRoutes($part_way, $routes);
+        /* You can also use other services such as bus or train. When it will be ready :)
+            $this->bus->search($route_search_form);
+            $routes = $this->bus->getRoutes($route_search_form);
+            $this->saveRoutes($route_search_form, $routes);
+            $this->bus->changeRouteSearchStatusToDone($route_search_form);
         */
     }
 
-    protected function saveRoutes(PartWay $part_way, array $routes) :void
+    protected function saveRoutes(RouteSearchForm $route_search, array $routes) :void
     {
         foreach ($routes as $key => $draft_route){
-            $part_way->price = $draft_route->price;
-            foreach ($draft_route->flights as $flight){
-                $from_point = Point::firstOrCreate(['code' => $flight->departure_point->code], ['name' => $flight->departure_point->name, 'address' => $flight->departure_point->name, 'type' => PointType::AIR_TYPE]);
-                $to_point = Point::firstOrCreate(['code' => $flight->arrival_point->code], ['name' => $flight->arrival_point->name, 'address' => $flight->arrival_point->name, 'type' => PointType::AIR_TYPE]);
+            foreach ($draft_route->routes as $droute){
+                $from_point = Point::firstOrCreate(['code' => $droute->departure_point->code], ['name' => $droute->departure_point->name, 'address' => $droute->departure_point->name, 'type' => PointType::AIR_TYPE]);
+                $to_point = Point::firstOrCreate(['code' => $droute->arrival_point->code], ['name' => $droute->arrival_point->name, 'address' => $droute->arrival_point->name, 'type' => PointType::AIR_TYPE]);
                 $route = new Route();
                 $route->type = RouteType::MOVING_TYPE;
-                $route->price = $draft_route['price']/count($draft_route['flights']);
-                $route->sdate = $flight->departure_date;
-                $route->edate = $flight->arrival_date;
-                $route->part_way_id = $part_way->id;
+                $route->price = $draft_route->price/count($draft_route->routes);
+                $route->sdate = $droute->departure_date;
+                $route->edate = $droute->arrival_date;
+                $route->route_search_form_id = $route_search->id;
                 $route->transport_type = TransportType::AIR_TYPE;
                 $route->from_id = $from_point->code;
                 $route->to_id = $to_point->code;
                 $route->index = $key;
                 $route->save();
             }
-            $part_way->save();
         }
     }
 

@@ -1,14 +1,14 @@
 <?php
 namespace App\Services\Travel;
 
-use App\Models\Way\PartWay;
-use App\Models\Way\WaySearch;
+use App\Models\Route\RouteSearchForm;
+use App\Models\Route\RouteSearch;
 
 interface FlightTravelService
 {
-    public function getRoutes(WaySearch $way_search) :array;
+    public function getRoutes(RouteSearch $way_search) :array;
 
-    public function search(PartWay $part_way) :string;
+    public function search(RouteSearchForm $route_search) :string;
 
     public function getServiceName() :string;
 }

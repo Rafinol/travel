@@ -46,6 +46,8 @@ class Trip extends Model
 
     protected $fillable = ['from_id', 'to_id', 'departure_date', 'status'];
 
+    protected $dates = ['departure_date', 'arrival_dates'];
+
     public static function new(int $from_id, int $to_id, $departure_date) :self
     {
         return self::create([
@@ -73,16 +75,23 @@ class Trip extends Model
 
 
 
-    public function isCompleted()
+    public function isCompleted() :bool
     {
         if($this->status == Status::DONE_STATUS)
             return true;
         return false;
     }
 
-    public function isSearching()
+    public function isSearching() :bool
     {
         if($this->status == Status::SEARCHING_STATUS)
+            return true;
+        return false;
+    }
+
+    public function isCreated() :bool
+    {
+        if($this->status == Status::NEW_STATUS)
             return true;
         return false;
     }

@@ -14,9 +14,9 @@ namespace App\Models\Route{
 /**
  * App\Models\Route\Route
  *
- * @method static \Illuminate\Database\Eloquent\Builder|Route newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Route newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Route query()
+ * @method static \Illuminate\Database\Eloquent\Builder|PartRoute newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|PartRoute newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|PartRoute query()
  */
 	class Route extends \Eloquent {}
 }

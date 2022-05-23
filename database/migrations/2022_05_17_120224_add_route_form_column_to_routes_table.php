@@ -14,8 +14,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('part_ways', function (Blueprint $table) {
-            $table->foreignIdFor(RouteSearchForm::class)->nullable();
+        Schema::table('routes', function (Blueprint $table) {
+            $table->foreignIdFor(RouteSearchForm::class);
         });
     }
 
@@ -26,7 +26,7 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('part_ways', function (Blueprint $table) {
+        Schema::table('routes', function (Blueprint $table) {
             $table->dropColumn('route_search_form_id');
         });
     }

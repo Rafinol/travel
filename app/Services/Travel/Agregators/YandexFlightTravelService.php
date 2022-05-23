@@ -54,6 +54,7 @@ class YandexFlightTravelService implements FlightTravelService
             'klass' => 'economy',
             'oneway' => 1,
         ];
+        sleep(30);
         $result = Http::get(self::INIT_URL, $body);
         return $result['id'];
     }

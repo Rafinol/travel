@@ -5,6 +5,7 @@ namespace App\Services\Travel\Agregators;
 use App\Models\RouteDto\RouteDto;
 use App\Models\RouteDto\ResultRouteDto;
 use App\Models\Point\StationDto;
+use App\Models\Transport\TransportType;
 use Carbon\Carbon;
 use JetBrains\PhpStorm\Pure;
 
@@ -45,6 +46,7 @@ class YandexFlight
         $flight->number = $fr['number'];
         $flight->departure_point = $this->getStation($fr['from']);
         $flight->arrival_point = $this->getStation($fr['to']);
+        $flight->transport_type = TransportType::AIR_TYPE;
         return $flight;
     }
 

@@ -6,6 +6,7 @@ use App\Http\Request\Trip\TripRequest;
 use App\Models\City\City;
 use App\Models\Point\Point;
 use App\Models\Point\PointType;
+use App\Models\Route\PartRoute;
 use App\Models\Route\Route;
 use App\Models\Route\RouteSearchForm;
 use App\Models\Route\RouteType;
@@ -14,6 +15,7 @@ use App\Models\Trip\Status;
 use App\Models\Trip\Trip;
 use App\Models\Way\PartWay;
 use App\Models\Way\Way;
+use App\Repositories\Routes\RouteRepository;
 use App\UseCases\Trip\Type\BusTripService;
 use App\UseCases\Trip\Type\AviaTripService;
 use App\UseCases\Trip\Type\TrainTripService;
@@ -26,29 +28,33 @@ class DefaultTripService implements DepartureService
     protected TrainTripService $train;
     protected BusTripService $bus;
 
-    const SLEEP_TIME = 10;
+    const SLEEP_TIME = 60;
 
     public array $routes = []; //Additional intermediate routes to search
+    private RouteRepository $repository;
 
-    public function __construct(AviaTripService $avia, TrainTripService $train, BusTripService $bus)
+    public function __construct(AviaTripService $avia, TrainTripService $train, BusTripService $bus, RouteRepository $repository)
     {
         $this->avia = $avia;
         $this->train = $train;
         $this->bus = $bus;
+        $this->repository = $repository;
     }
 
-    public function firstOrNew(TripRequest $request) :Trip
+    public function firstOrNew(string $from, string $to, Carbon $date) :Trip
     {
-        $trip = Trip::where(['departure_date' => $request['date'], 'from_id' => $request['from_id'], 'to_id' => $request['to_id']])->first();
+        $departure_city = City::where('name', $from)->first();
+        $arrival_city = City::where('name', $to)->first();
+        $trip = Trip::where(['departure_date' => $date, 'from_id' => $departure_city->id, 'to_id' => $arrival_city->id])->first();
         if(!$trip){
-            $trip = Trip::new($request['from_id'], $request['to_id'], $request['date']);
+            $trip = Trip::new($departure_city->id, $arrival_city->id, $date->startOfDay());
         }
         return $trip;
     }
 
-    public function getTrip(TripRequest $request) :Trip
+    public function getTrip(string $from, string $to, Carbon $date) :Trip
     {
-        $trip = $this->firstOrNew($request); //I don`t use firstOrCreate from Eloquent because need to set status in trip
+        $trip = $this->firstOrNew($from, $to, $date); //I don`t use firstOrCreate from Eloquent because need to set status in trip
         if($trip->isCompleted() || $trip->isSearching()){
             return $trip;
         }
@@ -116,7 +122,7 @@ class DefaultTripService implements DepartureService
 
     protected function searchWay(Trip $trip, Way $way) :void
     {
-        foreach ($way->part_way as $part_way){
+        foreach ($way->partWays as $part_way){
             if($part_way->arrival_date){ //if part_way has an arrival date, that`s mean it is done
                 continue;
             }
@@ -124,15 +130,32 @@ class DefaultTripService implements DepartureService
                 $part_way->departure_date = $trip->departure_date;
             }
             else{
-                $part_way->departure_date = $way->part_way[$part_way->position-1]->arrival_date;
+                $part_way->departure_date = $way->partWays[$part_way->position-1]->arrival_date;
             }
-            $route_search_form = RouteSearchForm::firstOrCreate(['from_id' => $part_way->from_id, 'to_id' => $part_way->to_id, 'departure_date' => Carbon::parse($part_way->departure_date)->startOfDay()]);
+            $route_search_form = RouteSearchForm::firstOrCreate(['from_id' => $part_way->from_id, 'to_id' => $part_way->to_id, 'departure_date' => $this->getDepartureDate($part_way->departure_date)]);
             $part_way->route_search_form_id = $route_search_form->id;
-            $this->requestAndSave($route_search_form);
-            $part_way->arrival_date = collect($part_way->routeSearchForm->routes)->min('edate');
             $part_way->save();
+            $this->requestAndSave($route_search_form);
+            $this->setArrivalDate($part_way);
         }
     }
+
+    private function getDepartureDate(Carbon $date) :Carbon
+    {
+        if($date->format('H') > 20){
+            $date->addDay();
+        }
+        return $date->startOfDay();
+    }
+
+    private function setArrivalDate(PartWay $part_way) :void
+    {
+        $route = $this->repository->getCheapestRouteByPartWay($part_way);
+        $part_way->arrival_date = $route->arrival_date;
+        $part_way->min_price = $route->price;
+        $part_way->save();
+    }
+
 
     public function requestAndSave(RouteSearchForm $route_search_form) :void //Extendable
     {
@@ -152,31 +175,45 @@ class DefaultTripService implements DepartureService
 
     protected function saveRoutes(RouteSearchForm $route_search, array $routes) :void
     {
-        foreach ($routes as $key => $draft_route){
+        foreach ($routes as $draft_route){
+            $route = Route::new(reset($draft_route->routes)->departure_date, last($draft_route->routes)->arrival_date, $draft_route->price, $route_search->id, count($draft_route->routes));
+            if(count($draft_route->routes) > 3){
+                continue;
+            }
             foreach ($draft_route->routes as $droute){
                 $from_point = Point::firstOrCreate(['code' => $droute->departure_point->code], ['name' => $droute->departure_point->name, 'address' => $droute->departure_point->name, 'type' => PointType::AIR_TYPE]);
                 $to_point = Point::firstOrCreate(['code' => $droute->arrival_point->code], ['name' => $droute->arrival_point->name, 'address' => $droute->arrival_point->name, 'type' => PointType::AIR_TYPE]);
-                $route = new Route();
-                $route->type = RouteType::MOVING_TYPE;
-                $route->price = $draft_route->price/count($draft_route->routes);
-                $route->sdate = $droute->departure_date;
-                $route->edate = $droute->arrival_date;
-                $route->route_search_form_id = $route_search->id;
-                $route->transport_type = TransportType::AIR_TYPE;
-                $route->from_id = $from_point->code;
-                $route->to_id = $to_point->code;
-                $route->index = $key;
-                $route->save();
+                $part_route = new PartRoute();
+                $part_route->type = RouteType::MOVING_TYPE;
+                $part_route->sdate = $droute->departure_date;
+                $part_route->edate = $droute->arrival_date;
+                $part_route->transport_type = $droute->transport_type;
+                $part_route->from_id = $from_point->code;
+                $part_route->to_id = $to_point->code;
+                $part_route->route_id = $route->id;
+                $part_route->save();
             }
         }
     }
 
-    public function processTrips() //For cron or queue
+    public function getBestWays(Trip $trip) :array
     {
-        $trips = Trip::where(['status' => Status::SEARCHING_STATUS])->all();
-        foreach ($trips as $trip){
-            $this->search($trip);
+        $ways = [];
+        foreach ($trip->ways as $way){
+            foreach ($way->partWays as $part_way){
+                $route = $this->repository->getCheapestRouteByPartWay($part_way, $ways[$way->id]['last_arrival'] ?? null);
+                if(!$route){
+                    unset($ways[$way->id]);
+                    break;
+                }
+                $ways[$way->id]['details'][] = ['part_way' => $part_way, 'route' => $route];
+                $ways[$way->id]['last_arrival'] = $route->partRoutes->last()->edate;
+                $ways[$way->id]['price'] = $route->price + ($ways[$way->id]['price'] ?? 0);
+                $ways[$way->id]['flights_count'] = $route->transfers_count + ($ways[$way->id]['flights_count'] ?? 0);
+            }
         }
+        return collect($ways)->sortBy('price')->all();
     }
+
 
 }

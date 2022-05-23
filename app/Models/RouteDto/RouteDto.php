@@ -12,4 +12,5 @@ class RouteDto
     public Carbon $arrival_date;
     public StationDto $departure_point;
     public StationDto $arrival_point;
+    public string $transport_type;
 }

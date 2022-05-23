@@ -7,7 +7,7 @@ namespace App\UseCases\Trip\Type;
 use App\Exceptions\RoutesNotReadyYetException;
 use App\Models\Point\Point;
 use App\Models\Point\PointType;
-use App\Models\Route\Route;
+use App\Models\Route\PartRoute;
 use App\Models\Route\RouteType;
 use App\Models\Transport\TransportType;
 use App\Models\Trip\Trip;

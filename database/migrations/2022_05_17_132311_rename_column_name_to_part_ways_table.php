@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Route\RouteSearchForm;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -15,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('part_ways', function (Blueprint $table) {
-            $table->foreignIdFor(RouteSearchForm::class)->nullable();
+            $table->renameColumn('price', 'min_price');
         });
     }
 
@@ -27,7 +26,7 @@ return new class extends Migration
     public function down()
     {
         Schema::table('part_ways', function (Blueprint $table) {
-            $table->dropColumn('route_search_form_id');
+            $table->renameColumn('min_price', 'price');
         });
     }
 };

@@ -3,7 +3,7 @@
 namespace App\Models\Way;
 
 use App\Models\City\City;
-use App\Models\Route\Route;
+use App\Models\Route\PartRoute;
 use App\Models\Route\RouteSearchForm;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -37,16 +37,20 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|PartWay whereWayId($value)
  * @mixin \Eloquent
  * @property int $price
- * @property-read \Illuminate\Database\Eloquent\Collection|Route[] $routes
+ * @property-read \Illuminate\Database\Eloquent\Collection|PartRoute[] $routes
  * @property-read int|null $routes_count
  * @method static \Illuminate\Database\Eloquent\Builder|PartWay wherePrice($value)
+ * @property int $route_search_form_id
+ * @property-read RouteSearchForm|null $routeSearchForm
+ * @method static \Illuminate\Database\Eloquent\Builder|PartWay whereRouteSearchFormId($value)
+ * @property int|null $min_price
+ * @method static \Illuminate\Database\Eloquent\Builder|PartWay whereMinPrice($value)
  */
 class PartWay extends Model
 {
     use HasFactory;
 
     protected $dates = ['departure_date', 'arrival_date'];
-
 
     public static function new($from_id, $to_id, $way_id, $position) :self
     {
@@ -74,8 +78,11 @@ class PartWay extends Model
         return $this->belongsTo(RouteSearchForm::class);
     }
 
-    /*public function routes()
+    public function routes()
     {
-        return $this->routeSearchForm();
-    }*/
+        return $this->routeSearchForm->routes;
+    }
+
+
+
 }

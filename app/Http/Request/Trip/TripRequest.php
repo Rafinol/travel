@@ -17,8 +17,8 @@ class TripRequest extends FormRequest
     public function rules() :array
     {
         return [
-            'from_id' => 'required|integer',
-            'to_id' => 'required|integer',
+            'from' => 'required|exists:cities,name',
+            'to'   => 'required|exists:cities,name',
             'date' => 'required|date_format:Y-m-d'
         ];
     }

@@ -18,7 +18,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read City|null $arrival
  * @property-read City|null $departure
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Route\Route[] $routes
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Route\PartRoute[] $routes
  * @property-read int|null $routes_count
  * @method static \Illuminate\Database\Eloquent\Builder|RouteSearchForm newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|RouteSearchForm newQuery()
@@ -64,4 +64,9 @@ class RouteSearchForm extends Model
     {
         return $this->hasMany(Route::class);
     }
+
+    /*public function validRoutesFor(Carbon $departure_date)
+    {
+        return $this->hasMany(Route::class, ['arrival_date - duration', '>', $departure_date]);
+    }*/
 }

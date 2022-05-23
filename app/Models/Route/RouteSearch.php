@@ -34,6 +34,8 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|RouteSearch whereDepartureDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|RouteSearch whereFromId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|RouteSearch whereToId($value)
+ * @property int $route_search_form_id
+ * @method static \Illuminate\Database\Eloquent\Builder|RouteSearch whereRouteSearchFormId($value)
  */
 class RouteSearch extends Model
 {

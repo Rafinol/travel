@@ -7,6 +7,7 @@ use App\Models\City\City;
 use App\Services\Travel\FlightTravelService;
 use App\UseCases\Trip\Departure\DepartureService;
 use App\UseCases\Trip\TripService;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 
 class GetTravelWays extends Command
@@ -33,11 +34,11 @@ class GetTravelWays extends Command
     public function handle(DepartureService $service)
     {
         $request = new TripRequest();
-        $request['from_id'] = City::where(['name' => $this->argument('from')])->firstOrFail()->id;
-        $request['to_id'] = City::where(['name' => $this->argument('to')])->firstOrFail()->id;
+        $request['from'] = $this->argument('from');
+        $request['to_id'] = $this->argument('to');
         $request['date'] = $this->argument('date');
         $request->validate($request->rules());
-        $trip = $service->getTrip($request);
+        $trip = $service->getTrip($this->argument('from'), $this->argument('to'), Carbon::createFromFormat('Y-m-d',$this->argument('date')));
         $service->search($trip);
         $this->info(json_encode($trip->ways));
     }

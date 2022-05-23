@@ -78,7 +78,7 @@ class Way extends Model
         return $this->belongsTo(Trip::class);
     }
 
-    public function part_way()
+    public function partWays()
     {
         return $this->hasMany(PartWay::class)->orderBy('position');
     }

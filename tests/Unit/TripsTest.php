@@ -3,7 +3,7 @@
 namespace Tests\Unit;
 
 use App\Models\City\City;
-use App\Models\Route\Route;
+use App\Models\Route\PartRoute;
 use App\Models\Route\RouteType;
 use App\Models\Transport\TransportType;
 use App\Models\Trip\Trip;
@@ -29,7 +29,7 @@ class TripsTest extends TestCase
         foreach ($ways as $way){
             $this->assertEquals($trip->id, $way->trip_id);
             $rand = rand(1,4);
-            $routes = Route::factory($rand)->create([
+            $routes = PartRoute::factory($rand)->create([
                 'way_id' => $way->id,
             ]);
             $this->assertEquals(count($routes), $rand);

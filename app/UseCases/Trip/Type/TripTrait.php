@@ -12,22 +12,22 @@ use App\Services\Travel\FlightTravelService;
 
 trait TripTrait
 {
-    public function search(RouteSearchForm $route_search) :void
+    public function getOrCreate(RouteSearchForm $route_search_form) :RouteSearch
     {
-        $way_search = RouteSearch::where(['type' => $this->service->getServiceName(), 'route_search_form_id' => $route_search->id,])->where('created_at', '>', now()->subDay())->first();
-        if(!$way_search) {
-            $way_search = RouteSearch::new($route_search->id, $this->service->getServiceName());
+        $route_search = RouteSearch::where(['type' => $this->service->getServiceName(), 'route_search_form_id' => $route_search_form->id,])->where('created_at', '>', now()->subDay())->first();
+        if(!$route_search) {
+            $route_search = RouteSearch::new($route_search_form->id, $this->service->getServiceName());
         }
-        if($way_search->isDone() || $way_search->isWaiting()){
-            return;
+        if($route_search->isDone()){
+            return $route_search;
         }
-        $search_id = $this->service->search($route_search);
-        $way_search->update(['search_id'=> $search_id, 'status' => RouteSearchStatus::WAITING_STATUS]);
+        $search_id = $this->service->search($route_search_form);
+        $route_search->update(['search_id'=> $search_id, 'status' => RouteSearchStatus::DONE_STATUS]);
+        return $route_search;
     }
 
-    public function getRoutes(RouteSearchForm $route_search_form) :array
+    public function getRoutes(RouteSearch $route_search) :array
     {
-        $route_search = RouteSearch::where(['type' => $this->service->getServiceName(), 'route_search_form_id' => $route_search_form->id,])->first();
         return $this->service->getRoutes($route_search);
     }
 

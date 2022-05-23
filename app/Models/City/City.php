@@ -30,12 +30,12 @@ class City extends Model
 {
     use HasFactory;
 
-    public static function getRandomCity() :self
+    public static function getRandomCity() :City
     {
         return self::inRandomOrder()->first();
     }
 
-    public static function getRandomCityExceptFor(int $except_id)
+    public static function getRandomCityExceptFor(int $except_id) :City
     {
         $point = self::inRandomOrder();
         if($except_id){

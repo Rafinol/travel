@@ -28,7 +28,7 @@ class DefaultTripService implements DepartureService
     protected TrainTripService $train;
     protected BusTripService $bus;
 
-    const SLEEP_TIME = 60;
+    const SLEEP_TIME = 25;
 
     public array $routes = []; //Additional intermediate routes to search
     private RouteRepository $repository;
@@ -201,7 +201,7 @@ class DefaultTripService implements DepartureService
         $ways = [];
         foreach ($trip->ways as $way){
             foreach ($way->partWays as $part_way){
-                $route = $this->repository->getCheapestRouteByPartWay($part_way, $ways[$way->id]['last_arrival'] ?? null);
+                $route = $this->repository->getCheapestRouteByPartWay($part_way, $ways[$way->id]['last_arrival']->addHours(2) ?? null);
                 if(!$route){
                     unset($ways[$way->id]);
                     break;

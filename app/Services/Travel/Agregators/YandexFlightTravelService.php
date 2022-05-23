@@ -4,6 +4,7 @@
 namespace App\Services\Travel\Agregators;
 
 
+use App\Exceptions\CityNotFoundException;
 use App\Exceptions\RoutesAlreadyDoneException;
 use App\Exceptions\RoutesNotReadyYetException;
 use App\Models\City\City;
@@ -33,17 +34,20 @@ class YandexFlightTravelService implements FlightTravelService
         return self::SERVICE_NAME;
     }
 
-    public function search(RouteSearchForm $route_search_form) :string
+    public function search(RouteSearchForm $form) :string
     {
-        return $this->createSearch($route_search_form->departure, $route_search_form->arrival, $route_search_form->departure_date);
+        return $this->createSearch($form->departure, $form->arrival, $form->departure_date);
     }
 
     private function createSearch(City $from, City $to, $date) :string
     {
-        if(!$from->yandex_id || !$to->yandex_id){
+        if(!$from->yandex_id){
             $from = $from->updateForeignId($this->getCityId($from->name));
+        }
+        if(!$to->yandex_id){
             $to = $to->updateForeignId($this->getCityId($to->name));
         }
+
         $body = [
             'fromId' => $from->yandex_id,
             'toId' => $to->yandex_id,
@@ -53,9 +57,16 @@ class YandexFlightTravelService implements FlightTravelService
             'infant_seats' => 0,
             'klass' => 'economy',
             'oneway' => 1,
+            //'proxy' => 'https://PAJWTR:5XYTLV@217.29.63.254:12021'
         ];
-        sleep(30);
-        $result = Http::get(self::INIT_URL, $body);
+        $result = Http::withHeaders(['proxy' => 'https://PAJWTR:5XYTLV@217.29.63.254:12021'])->get(self::INIT_URL, $body);
+       /* $client = new Client();
+        $result = $client->get(self::INIT_URL, $body);
+        $body = $result->getBody();*/
+        if(!$result->json()){
+            sleep(90);
+            return $this->createSearch($from, $to, $date);
+        }
         return $result['id'];
     }
 
@@ -69,7 +80,10 @@ class YandexFlightTravelService implements FlightTravelService
             'showCountries' => 0,
             'showAnywhere' => 0,
         ]);
-        $json = $result->json();
+        if(empty($result['items'])){
+            throw new CityNotFoundException();
+        }
+        sleep(5);
         return $result['items'][0]['pointKey'];
     }
 
@@ -88,6 +102,10 @@ class YandexFlightTravelService implements FlightTravelService
         $response = Http::retry(3, 10000)->get(self::GET_RESULT_URL, $params);
         if(!$response){
             throw new \DomainException('travels not found:(');
+        }
+        if(!$response->json()){
+            sleep(90);
+            return $this->getResults($search_id);
         }
         $ya_flights = new YandexFlight($response->json());
         return $ya_flights->getFlights();

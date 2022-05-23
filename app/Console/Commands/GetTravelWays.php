@@ -35,7 +35,7 @@ class GetTravelWays extends Command
     {
         $request = new TripRequest();
         $request['from'] = $this->argument('from');
-        $request['to_id'] = $this->argument('to');
+        $request['to'] = $this->argument('to');
         $request['date'] = $this->argument('date');
         $request->validate($request->rules());
         $trip = $service->getTrip($this->argument('from'), $this->argument('to'), Carbon::createFromFormat('Y-m-d',$this->argument('date')));

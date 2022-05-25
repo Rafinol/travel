@@ -52,13 +52,16 @@ class PartWay extends Model
 
     protected $dates = ['departure_date', 'arrival_date'];
 
-    public static function new($from_id, $to_id, $way_id, $position) :self
+    public static function new($from_id, $to_id, $way_id, $position, $date) :self
     {
         $part_way = new self();
         $part_way->from_id = $from_id;
         $part_way->to_id = $to_id;
         $part_way->way_id = $way_id;
         $part_way->position = $position;
+        if($position == 0){
+            $part_way->departure_date = $date;
+        }
         $part_way->save();
         return $part_way;
     }
@@ -81,6 +84,13 @@ class PartWay extends Model
     public function routes()
     {
         return $this->routeSearchForm->routes;
+    }
+
+    public function isCompleted() :bool //if part_way has an arrival date, that`s mean it is done
+    {
+        if($this->arrival_date)
+            return true;
+        return false;
     }
 
 

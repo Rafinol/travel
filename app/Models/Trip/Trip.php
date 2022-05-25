@@ -15,8 +15,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id
  * @property int $from_id
  * @property int $to_id
- * @property string $departure_date
- * @property string $arrival_date
+ * @property Carbon $departure_date
+ * @property Carbon $arrival_date
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @method static \Illuminate\Database\Eloquent\Builder|Trip newModelQuery()
@@ -99,6 +99,12 @@ class Trip extends Model
     public function changeStatusToSearching()
     {
         $this->status = Status::SEARCHING_STATUS;
+        $this->save();
+    }
+
+    public function changeStatusToWaiting()
+    {
+        $this->status = Status::WAITING_STATUS;
         $this->save();
     }
 

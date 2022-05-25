@@ -19,6 +19,7 @@ use App\Models\Way\Way;
 use App\Services\Travel\FlightTravelService;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Http;
 
 class YandexFlightTravelService implements FlightTravelService
@@ -39,7 +40,7 @@ class YandexFlightTravelService implements FlightTravelService
         return $this->createSearch($form->departure, $form->arrival, $form->departure_date);
     }
 
-    private function createSearch(City $from, City $to, $date) :string
+    public function createSearch(City $from, City $to, $date) :string
     {
         if(!$from->yandex_id){
             $from = $from->updateForeignId($this->getCityId($from->name));
@@ -60,9 +61,6 @@ class YandexFlightTravelService implements FlightTravelService
             //'proxy' => 'https://PAJWTR:5XYTLV@217.29.63.254:12021'
         ];
         $result = Http::withHeaders(['proxy' => 'https://PAJWTR:5XYTLV@217.29.63.254:12021'])->get(self::INIT_URL, $body);
-       /* $client = new Client();
-        $result = $client->get(self::INIT_URL, $body);
-        $body = $result->getBody();*/
         if(!$result->json()){
             sleep(90);
             return $this->createSearch($from, $to, $date);
@@ -83,16 +81,21 @@ class YandexFlightTravelService implements FlightTravelService
         if(empty($result['items'])){
             throw new CityNotFoundException();
         }
-        sleep(5);
         return $result['items'][0]['pointKey'];
     }
 
     public function getRoutes(RouteSearch $route_search): array
     {
-        return $this->getResults($route_search->search_id);
+        $response = $this->getResults($route_search->search_id);
+        if(!$response){
+            sleep(90);
+            return $this->getRoutes($route_search);
+        }
+        $ya_flights = new YandexFlight($response);
+        return $ya_flights->getFlights();
     }
 
-    private function getResults(string $search_id) :array
+    public function getResults(string $search_id) : array
     {
         $params = [
             'qid' => $search_id,
@@ -103,11 +106,6 @@ class YandexFlightTravelService implements FlightTravelService
         if(!$response){
             throw new \DomainException('travels not found:(');
         }
-        if(!$response->json()){
-            sleep(90);
-            return $this->getResults($search_id);
-        }
-        $ya_flights = new YandexFlight($response->json());
-        return $ya_flights->getFlights();
+        return $response->json();
     }
 }

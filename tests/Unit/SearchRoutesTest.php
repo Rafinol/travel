@@ -3,8 +3,12 @@
 namespace Tests\Unit;
 
 use App\Models\City\City;
+use App\Models\Route\RouteSearchForm;
 use App\Models\RouteDto\ResultRouteDto;
-use App\UseCases\Trip\RoutesSearchService;
+use App\Services\Travel\Agregators\MockYandexFlightTravelService;
+use App\Services\Travel\FlightTravelService;
+use App\UseCases\Trip\SearchRoutesService;
+use App\UseCases\Trip\Type\AviaTripService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -20,11 +24,14 @@ class SearchRoutesTest extends TestCase
 
     public function test_search_Kazan_to_Rome_response()
     {
-        $service = \App::make(RoutesSearchService::class);
+        \App::singleton(FlightTravelService::class, MockYandexFlightTravelService::class);
+        /** @var SearchRoutesService $service*/
+        $service = \App::make(SearchRoutesService::class);
         $departure_city = City::where('name', 'Kazan')->first();
         $arrival_city = City::where('name', 'Rome')->first();
         $date = Carbon::tomorrow();
         $search_form = $service->getOrCreateSearchForm($departure_city, $arrival_city, $date);
+        $this->assertInstanceOf(RouteSearchForm::class, $search_form);
         $routes = $service->search($search_form);
         $this->assertInstanceOf(ResultRouteDto::class, $routes[0]);
     }

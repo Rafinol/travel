@@ -25,9 +25,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class CustomTripService extends DefaultTripService implements DepartureService
 {
     public array $routes = [
-        /*['Moscow'], // Из Казани в Москву, из Москвы в точку направления
+        ['Moscow'], // Из Казани в Москву, из Москвы в точку направления
         ['Saint Petersburg'],
-*/
+
         ['Kaliningrad','Gdansk'],// Из Казани в Калининград, из Калининграда в Гдянск, из Гдянска в точку направления
         ['Moscow','Kaliningrad','Gdansk'],// Из Казани в Москву, из Москвы в Калининград, из Калининграда в Гдянск, из Гдянска в точку направления
 

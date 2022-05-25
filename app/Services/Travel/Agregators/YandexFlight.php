@@ -2,6 +2,7 @@
 namespace App\Services\Travel\Agregators;
 
 
+use App\Models\Point\PointType;
 use App\Models\RouteDto\RouteDto;
 use App\Models\RouteDto\ResultRouteDto;
 use App\Models\Point\StationDto;
@@ -53,7 +54,7 @@ class YandexFlight
     #[Pure] private function getStation($id) :StationDto
     {
         $station = $this->stations[$id];
-        return new StationDto($station['code'], $station['title']);
+        return new StationDto($station['code'], $station['title'], PointType::AIR_TYPE);
     }
 
     private function getMinFlightPrice(array $values) :int

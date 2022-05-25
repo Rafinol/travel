@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\City\City;
-use App\UseCases\Trip\RoutesSearchService;
+use App\UseCases\Trip\SearchRoutesService;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 
@@ -27,7 +27,7 @@ class SearchRoutesCommand extends Command
      * Execute the console command.
      *
      */
-    public function handle(RoutesSearchService $service)
+    public function handle(SearchRoutesService $service)
     {
         $departure = City::where(['name' => $this->argument('from')])->firstOrFail();
         $arrival = City::where(['name' => $this->argument('to')])->firstOrFail();

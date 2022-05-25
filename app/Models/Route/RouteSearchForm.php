@@ -3,9 +3,11 @@
 namespace App\Models\Route;
 
 use App\Models\City\City;
+use App\Models\Way\Way;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 /**
  * App\Models\Route\RouteSearchForm
@@ -14,6 +16,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property Carbon $departure_date
  * @property int $from_id
  * @property int $to_id
+ * @property string $status
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read City|null $arrival
@@ -40,6 +43,9 @@ class RouteSearchForm extends Model
     protected $fillable = ['from_id', 'to_id', 'departure_date'];
     protected $dates = ['departure_date'];
 
+    const WAITING_STATUS = 'waiting';
+    const DONE_STATUS = 'done';
+
     /*public static function new($from_id, $to_id, $departure_date) :self
     {
         $part_way = new self();
@@ -65,8 +71,8 @@ class RouteSearchForm extends Model
         return $this->hasMany(Route::class);
     }
 
-    /*public function validRoutesFor(Carbon $departure_date)
+    public function scopeWaiting(Builder $query)
     {
-        return $this->hasMany(Route::class, ['arrival_date - duration', '>', $departure_date]);
-    }*/
+        return $query->where('status', self::WAITING_STATUS);
+    }
 }

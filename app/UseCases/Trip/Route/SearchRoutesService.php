@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\UseCases\Trip;
+namespace App\UseCases\Trip\Route;
 
 
 use App\Models\City\City;
@@ -11,7 +11,7 @@ use App\UseCases\Trip\Type\BusTripService;
 use App\UseCases\Trip\Type\TrainTripService;
 use Carbon\Carbon;
 
-class RoutesSearchService
+class SearchRoutesService
 {
     private BusTripService $bus;
     private TrainTripService $train;
@@ -29,7 +29,8 @@ class RoutesSearchService
         return RouteSearchForm::firstOrCreate([
             'from_id' => $departure->id,
             'to_id' => $arrival->id,
-            'departure_date' => $date]);
+            'departure_date' => $date
+        ]);
     }
 
     public function search(RouteSearchForm $form) :array

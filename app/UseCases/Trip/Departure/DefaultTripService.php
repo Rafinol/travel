@@ -31,17 +31,17 @@ class DefaultTripService implements DepartureService
     const SLEEP_TIME = 25;
 
     public array $routes = []; //Additional intermediate routes to search
-    private RouteRepository $repository;
+    /*private RouteRepository $repository;*/
 
-    public function __construct(AviaTripService $avia, TrainTripService $train, BusTripService $bus, RouteRepository $repository)
+   /* public function __construct(AviaTripService $avia, TrainTripService $train, BusTripService $bus, RouteRepository $repository)
     {
         $this->avia = $avia;
         $this->train = $train;
         $this->bus = $bus;
         $this->repository = $repository;
-    }
+    }*/
 
-    public function firstOrNew(string $from, string $to, Carbon $date) :Trip
+    /*public function firstOrNew(string $from, string $to, Carbon $date) :Trip
     {
         $departure_city = City::where('name', $from)->first();
         $arrival_city = City::where('name', $to)->first();
@@ -50,28 +50,28 @@ class DefaultTripService implements DepartureService
             $trip = Trip::new($departure_city->id, $arrival_city->id, $date->startOfDay());
         }
         return $trip;
-    }
+    }*/
 
     public function getTrip(string $from, string $to, Carbon $date) :Trip
     {
-        $trip = $this->firstOrNew($from, $to, $date); //I don`t use firstOrCreate from Eloquent because need to set status in trip
+        /*$trip = $this->firstOrNew($from, $to, $date); //I don`t use firstOrCreate from Eloquent because need to set status in trip
         if($trip->isCompleted() || $trip->isSearching()){
             return $trip;
-        }
-        $this->checkExistCities();
-        array_map(function($route) use ($trip){
+        }*/
+        /*$this->checkExistCities();*/
+        /*array_map(function($route) use ($trip){
             $way = Way::new($trip->id, implode(' - ',$route));
             foreach (ArrayHelper::splitOfPairs($route) as $key => $pair){
                 $city_from = City::where(['name' => $pair[0]])->first();
                 $to_from = City::where(['name' => $pair[1]])->first();
                 PartWay::new($city_from->id, $to_from->id, $way->id, $key);
             }
-        }, $this->prepareRouteArray($trip));
-        $trip->changeStatusToSearching();
-        return $trip;
+        }, $this->prepareRouteArray($trip));*/
+        /*$trip->changeStatusToSearching();*/
+        /*return $trip;*/
     }
 
-    private function prepareRouteArray(Trip $trip) :array
+   /* private function prepareRouteArray(Trip $trip) :array
     {
         $routes = array_map(function($value) use ($trip){
             array_unshift($value, $trip->departure->name);
@@ -82,7 +82,7 @@ class DefaultTripService implements DepartureService
         }, $this->routes);
         array_unshift($routes, [$trip->departure->name, $trip->arrival->name]);
         return $routes;
-    }
+    }*/
 
     /*public function search(Trip $trip) :void
     {
@@ -92,7 +92,7 @@ class DefaultTripService implements DepartureService
     }*/
 
 
-    private function checkExistCities() :void
+    /*private function checkExistCities() :void
     {
         $cities = [];
         foreach ($this->routes as $route){
@@ -104,7 +104,7 @@ class DefaultTripService implements DepartureService
         if(count($unique_cities) != City::whereIn('name' , $unique_cities)->count()){
             throw new NotFoundHttpException('Some cities not found');
         }
-    }
+    }*/
 
     public function search(Trip $trip) :void
     {
@@ -173,7 +173,7 @@ class DefaultTripService implements DepartureService
         */
     }
 
-    protected function saveRoutes(RouteSearchForm $route_search, array $routes) :void
+    /*protected function saveRoutes(RouteSearchForm $route_search, array $routes) :void
     {
         foreach ($routes as $draft_route){
             $route = Route::new(reset($draft_route->routes)->departure_date, last($draft_route->routes)->arrival_date, $draft_route->price, $route_search->id, count($draft_route->routes));
@@ -194,7 +194,7 @@ class DefaultTripService implements DepartureService
                 $part_route->save();
             }
         }
-    }
+    }*/
 
     public function getBestWays(Trip $trip) :array
     {

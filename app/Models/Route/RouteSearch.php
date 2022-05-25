@@ -69,7 +69,7 @@ class RouteSearch extends Model
         return false;
     }
 
-    public function isDone() :bool
+    public function isCompleted() :bool
     {
         if($this->status == RouteSearchStatus::DONE_STATUS){
             return true;

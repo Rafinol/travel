@@ -88,4 +88,9 @@ class RouteSearch extends Model
         $this->status = RouteSearchStatus::DONE_STATUS;
         $this->save();
     }
+
+    public function searchForm()
+    {
+        return $this->hasOne(RouteSearchForm::class);
+    }
 }

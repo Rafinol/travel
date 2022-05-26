@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\City\City;
-use App\Services\Travel\Agregators\YandexFlightTravelService;
+use App\Services\Travel\Yandex\YandexTravelService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -18,8 +18,8 @@ class YandexTravelResponseTest extends TestCase
      */
     public function test_example()
     {
-        /** @var YandexFlightTravelService $service */
-        $service = \App::make(YandexFlightTravelService::class);
+        /** @var YandexTravelService $service */
+        $service = \App::make(YandexTravelService::class);
         $departure_city = City::where('name', 'Kazan')->first();
         $arrival_city = City::where('name', 'Rome')->first();
         $date = Carbon::tomorrow();

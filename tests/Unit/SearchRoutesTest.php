@@ -5,7 +5,7 @@ namespace Tests\Unit;
 use App\Models\City\City;
 use App\Models\Route\RouteSearchForm;
 use App\Models\RouteDto\ResultRouteDto;
-use App\Services\Travel\Agregators\MockYandexFlightTravelService;
+use App\Services\Travel\Yandex\MockYandexFlightTravelService;
 use App\Services\Travel\FlightTravelService;
 use App\UseCases\Trip\SearchRoutesService;
 use App\UseCases\Trip\Type\AviaTripService;

@@ -27,15 +27,14 @@ class WayService
         }
     }
 
-    public function search(Way $way)
+    public function prepareForSearch(Way $way)
     {
         if($way->isCompleted()){
             return;
         }
         $way->changeStatusToWaiting();
         foreach ($way->partWays as $part_way){
-            $this->partWayService->search($part_way);
+            $this->partWayService->prepareForSearch($part_way);
         }
-        $way->changeStatusToCompleted();
     }
 }

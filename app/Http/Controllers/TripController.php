@@ -6,6 +6,7 @@ use App\Http\Request\Trip\TripRequest;
 use App\Jobs\ProccessRoutesSearch;
 use App\Models\Trip\Trip;
 use App\UseCases\Trip\Departure\DepartureService;
+use App\UseCases\Trip\TripService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use MenaraSolutions\Geographer\City;
@@ -14,9 +15,9 @@ use MenaraSolutions\Geographer\Earth;
 
 class TripController extends Controller
 {
-    private DepartureService $service;
+    private TripService $service;
 
-    public function __construct(DepartureService $service)
+    public function __construct(TripService $service)
     {
         $this->service = $service;
     }
@@ -28,7 +29,7 @@ class TripController extends Controller
 
     public function create(TripRequest $request)
     {
-        $trip = $this->service->getTrip($request->input('from'), $request->input('to'), Carbon::createFromFormat('Y-m-d',$request->input('date')));
+        $trip = $this->service->getPreparedTrip($request->input('from'), $request->input('to'), Carbon::createFromFormat('Y-m-d',$request->input('date')));
         ProccessRoutesSearch::dispatch($trip);
         return redirect()->route('trip.show', ['id' => $trip->id]);
     }

@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Services\Travel\Agregators;
+namespace App\Services\Travel\Yandex;
 
 
 use App\Exceptions\CityNotFoundException;
@@ -16,13 +16,14 @@ use App\Models\Point\StationDto;
 use App\Models\Trip\Trip;
 use App\Models\Way\PartWay;
 use App\Models\Way\Way;
+use App\Services\Travel\CommonTravelService;
 use App\Services\Travel\FlightTravelService;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Http;
 
-class YandexFlightTravelService implements FlightTravelService
+class YandexTravelService implements FlightTravelService, CommonTravelService
 {
     const INIT_URL = 'https://travel.yandex.ru/api/avia/search/init';
     const GET_CITY_URL = 'https://travel.yandex.ru/api/avia/searchSuggest';
@@ -61,10 +62,10 @@ class YandexFlightTravelService implements FlightTravelService
             //'proxy' => 'https://PAJWTR:5XYTLV@217.29.63.254:12021'
         ];
         $result = Http::withHeaders(['proxy' => 'https://PAJWTR:5XYTLV@217.29.63.254:12021'])->get(self::INIT_URL, $body);
-        if(!$result->json()){
+        /*if(!$result->json()){
             sleep(90);
             return $this->createSearch($from, $to, $date);
-        }
+        }*/
         return $result['id'];
     }
 
@@ -87,10 +88,10 @@ class YandexFlightTravelService implements FlightTravelService
     public function getRoutes(RouteSearch $route_search): array
     {
         $response = $this->getResults($route_search->search_id);
-        if(!$response){
+        /*if(!$response){
             sleep(90);
             return $this->getRoutes($route_search);
-        }
+        }*/
         $ya_flights = new YandexFlight($response);
         return $ya_flights->getFlights();
     }

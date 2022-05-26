@@ -3,17 +3,24 @@ namespace App\UseCases\Trip\Way;
 
 use App\Models\Route\RouteSearchForm;
 use App\Models\Trip\Status;
-use App\Models\Trip\Trip;
 use App\Models\Way\PartWay;
 use App\Models\Way\Way;
 use App\Models\Way\WayStatus;
+use App\Repositories\Routes\RouteRepository;
 
 class LoadWaysService
 {
-    const TRANSFER_STOCK_TIME = 1; // hours
+    private RouteRepository $repository;
+    const LAST_ARRIVAL_TIME = 20;
+
+    public function __construct(RouteRepository $repository)
+    {
+        $this->repository = $repository;
+    }
 
     public function load()
     {
+        $this->updateArrivalDates();
         $this->updateDepartureDates(); // If previous part_way in table has arrival_time, update departure_time for next part_way
         $this->updateWayStatuses();
         $this->updateTripStatuses();
@@ -35,7 +42,9 @@ class LoadWaysService
 
     public function updateArrivalDate(PartWay $part_way) :void
     {
-
+        $route = $this->repository->getCheapestRouteByPartWay($part_way);
+        $part_way->arrival_date = $route->arrival_date;
+        $part_way->save();
     }
 
     public function updateDepartureDates() :void
@@ -45,7 +54,12 @@ class LoadWaysService
             ->where('pw.way_id', 'pw2.way_id')
             ->whereNull('pw.departure_date')
             ->whereNotNull('pw2.arrival_date')
-            ->update(['pw.departure_date' => '(pw2.arrival_date + INTERVAL '.self::TRANSFER_STOCK_TIME.' HOUR)']);
+            ->update(['pw.departure_date' =>
+                'IF(HOUR(pw2.arrival_date) < '.self::LAST_ARRIVAL_TIME.',
+                    pw2.arrival_date,
+                    DATE_FORMAT(DATE_ADD(pw2.arrival_date, INTERVAL 1 DAY),"%Y-%m-%d 00:00:00")']);
+        //If the arrival is before 20:00, then we will take the this day
+        //If the arrival is after 20:00, then we will search for tickets the next day
     }
 
     public function updateWayStatuses() :void

@@ -1,5 +1,5 @@
 <?php
-namespace App\Services\Travel\Agregators;
+namespace App\Services\Travel\Yandex;
 
 
 use App\Models\Point\PointType;

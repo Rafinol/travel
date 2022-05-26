@@ -1,10 +1,10 @@
 <?php
-namespace App\Services\Travel\Agregators;
+namespace App\Services\Travel\Yandex;
 
 use App\Models\City\City;
 use Illuminate\Support\Facades\Storage;
 
-class MockYandexFlightTravelService extends YandexFlightTravelService
+class MockYandexFlightTravelService extends YandexTravelService
 {
     public function createSearch(City $from, City $to, $date) :string
     {

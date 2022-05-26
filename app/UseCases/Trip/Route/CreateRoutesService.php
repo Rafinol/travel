@@ -18,12 +18,6 @@ use Illuminate\Database\Eloquent\Model;
 class CreateRoutesService
 {
     const MAX_TRANSFERS = 3;
-    private SearchRoutesService $searchService;
-
-    public function __construct(SearchRoutesService $searchService)
-    {
-        $this->searchService = $searchService;
-    }
 
     public function saveRoutes(RouteSearchForm $route_form, array $raw_routes) :void
     {

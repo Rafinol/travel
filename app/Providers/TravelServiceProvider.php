@@ -2,12 +2,15 @@
 
 namespace App\Providers;
 
+use App\Services\Travel\BusMock\BusMockTravelService;
+use App\Services\Travel\BusRideTravelService;
 use App\Services\Travel\FlightTravelService;
-use App\Services\Travel\Agregators\YandexFlightTravelService;
+use App\Services\Travel\Yandex\YandexTravelService;
 use App\UseCases\Trip\Departure\DefaultTripService;
 use App\UseCases\Trip\Departure\DepartureService;
 use App\UseCases\Trip\Departure\CustomTripService;
-use App\UseCases\Trip\TravelWaysService;
+use App\UseCases\Trip\Type\BusTripService;
+use App\UseCases\Trip\Way\TravelWaysService;
 use Illuminate\Support\ServiceProvider;
 
 class TravelServiceProvider extends ServiceProvider
@@ -19,11 +22,16 @@ class TravelServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton(FlightTravelService::class, YandexFlightTravelService::class);
-        //$this->app->singleton(DepartureService::class, DefaultTripService::class);
-        $this->app->singleton(DepartureService::class, CustomTripService::class);
-        $this->app->bind(TravelWaysService::class, function ($app) {
-            return new TravelWaysService($this->app->make('config')->get('travelways') ?? []);
+        $this->app->singleton(FlightTravelService::class, YandexTravelService::class);
+        $this->app->singleton(BusRideTravelService::class, BusMockTravelService::class);
+        $this->app->singleton(TravelWaysService::class, function ($app) {
+            return new TravelWaysService($app->make('config')->get('travelways')['additional_routes'] ?? []);
+        });
+        $this->app->singleton(BusTripService::class, function ($app) {
+            return new BusTripService(
+                $app->make('config')->get('travelways')['exclusive_bus_pairs'] ?? [],
+                $app->make(BusRideTravelService::class)
+            );
         });
     }
 

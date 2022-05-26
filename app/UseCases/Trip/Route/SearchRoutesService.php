@@ -5,6 +5,7 @@ namespace App\UseCases\Trip\Route;
 
 
 use App\Models\City\City;
+use App\Models\Route\RouteSearch;
 use App\Models\Route\RouteSearchForm;
 use App\UseCases\Trip\Type\AviaTripService;
 use App\UseCases\Trip\Type\BusTripService;
@@ -35,6 +36,9 @@ class SearchRoutesService
 
     public function search(RouteSearchForm $form) :array
     {
+        if($this->bus->hasExclusiveRoute($form)){
+            return $this->bus->getRoutes(new RouteSearch());  // Temporarily use a mock until busService is ready
+        }
         $route_search = $this->avia->getOrCreate($form);
         return $this->avia->getRoutes($route_search);
     }

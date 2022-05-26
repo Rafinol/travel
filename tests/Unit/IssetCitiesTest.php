@@ -3,7 +3,7 @@
 namespace Tests\Unit;
 
 use App\Models\City\City;
-use App\UseCases\Trip\TravelWaysService;
+use App\UseCases\Trip\Way\TravelWaysService;
 use Tests\TestCase;
 
 class IssetCitiesTest extends TestCase

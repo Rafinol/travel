@@ -7,7 +7,7 @@ use App\Models\Route\RouteSearchForm;
 use App\Models\RouteDto\ResultRouteDto;
 use App\Services\Travel\Yandex\MockYandexFlightTravelService;
 use App\Services\Travel\FlightTravelService;
-use App\UseCases\Trip\SearchRoutesService;
+use App\UseCases\Trip\Route\SearchRoutesService;
 use App\UseCases\Trip\Type\AviaTripService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;

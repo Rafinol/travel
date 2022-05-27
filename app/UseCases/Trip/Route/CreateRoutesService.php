@@ -11,6 +11,7 @@ use App\Models\Route\PartRoute;
 use App\Models\Route\Route;
 use App\Models\Route\RouteSearchForm;
 use App\Models\Route\RouteType;
+use App\Models\RouteDto\ResultRouteDto;
 use App\Models\RouteDto\RouteDto;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
@@ -19,6 +20,10 @@ class CreateRoutesService
 {
     const MAX_TRANSFERS = 3;
 
+    /**
+     * @param RouteSearchForm $route_form
+     * @var ResultRouteDto[] $raw_routes
+     */
     public function saveRoutes(RouteSearchForm $route_form, array $raw_routes) :void
     {
         foreach ($raw_routes as $raw_route){
@@ -29,9 +34,6 @@ class CreateRoutesService
                 $route_form->id,
                 count($raw_route->routes)
             );
-            if(count($raw_route->routes) > self::MAX_TRANSFERS){
-                continue;
-            }
             foreach ($raw_route->routes as $raw_part_route){
                 $this->savePartRoutes($route->id, $raw_part_route);
             }

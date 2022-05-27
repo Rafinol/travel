@@ -2,6 +2,7 @@
 namespace App\UseCases\Trip\Route;
 
 use App\Models\Route\RouteSearchForm;
+use App\UseCases\Trip\RouteDtoCleanerService;
 
 class LoadRoutesService
 {
@@ -19,6 +20,7 @@ class LoadRoutesService
         $forms = RouteSearchForm::waiting()->get();
         foreach ($forms as $form){
             $routes = $this->searchService->search($form);
+            $routes = RouteDtoCleanerService::getTopRoutes($routes);
             $this->createService->saveRoutes($form, $routes);
         }
     }

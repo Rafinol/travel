@@ -25,10 +25,10 @@ class TravelWaysService
         return collect($cities)->keyBy('name')->all();
     }
 
-    public function getUniqueCitiesFromWays(array $ways) :array
+    public function getUniqueCitiesFromWays(array $ways=null) :array
     {
         $cities = [];
-        foreach ($ways as $route){
+        foreach ($ways ?: $this->ways as $route){
             foreach($route as $city){
                 $cities[] = $city;
             }

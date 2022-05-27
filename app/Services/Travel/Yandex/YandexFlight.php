@@ -33,7 +33,11 @@ class YandexFlight
             foreach ($fare['route'][0] as $route_key){
                 $routes[] = $this->create($route_key);
             }
-            $flights[] = new ResultRouteDto($this->getMinFlightPrice($fare['prices']), $routes);
+            $flights[] = new ResultRouteDto(
+                $this->getMinFlightPrice($fare['prices']),
+                reset($routes)->departure_date,
+                last($routes)->arrival_date,
+                $routes);
         }
         return $flights;
     }

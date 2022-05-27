@@ -18,17 +18,17 @@ class TravelWaysService
         return $this->changeCitiesNameToModels($ways);
     }
 
-    private function getCityModels() :array
+    private function getCityModels(array $ways) :array
     {
-        $unique_cities = $this->getUniqueCitiesFromWays();
-        $cities = City::where('name', $unique_cities)->get();
+        $unique_cities = $this->getUniqueCitiesFromWays($ways);
+        $cities = City::whereIn('name', $unique_cities)->get();
         return collect($cities)->keyBy('name')->all();
     }
 
-    public function getUniqueCitiesFromWays() :array
+    public function getUniqueCitiesFromWays(array $ways) :array
     {
         $cities = [];
-        foreach ($this->ways as $route){
+        foreach ($ways as $route){
             foreach($route as $city){
                 $cities[] = $city;
             }
@@ -38,7 +38,7 @@ class TravelWaysService
 
     private function changeCitiesNameToModels(array $ways) :array
     {
-        $cities = $this->getCityModels();
+        $cities = $this->getCityModels($ways);
         foreach ($ways as $key => $way){
             foreach ($way as $part_key => $city_name){
                 $ways[$key][$part_key] = $cities[$city_name];

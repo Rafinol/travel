@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Request\Trip\TripRequest;
 use App\Jobs\ProccessRoutesSearch;
+use App\Jobs\ProccessWaysInit;
 use App\Models\Trip\Trip;
 use App\UseCases\Trip\Departure\DepartureService;
 use App\UseCases\Trip\TripService;
@@ -30,14 +31,16 @@ class TripController extends Controller
     public function create(TripRequest $request)
     {
         $trip = $this->service->getPreparedTrip($request->input('from'), $request->input('to'), Carbon::createFromFormat('Y-m-d',$request->input('date')));
-        ProccessRoutesSearch::dispatch($trip);
+        ProccessRoutesSearch::dispatch();
+        ProccessWaysInit::dispatch();
         return redirect()->route('trip.show', ['id' => $trip->id]);
     }
 
     public function dispatch($id)
     {
         $trip = Trip::find($id);
-        ProccessRoutesSearch::dispatch($trip);
+        ProccessRoutesSearch::dispatch();
+        ProccessWaysInit::dispatch();
         return redirect()->route('trip.show', ['id' => $trip->id]);
     }
 
@@ -47,7 +50,7 @@ class TripController extends Controller
         if($trip->isSearching() || $trip->isCreated()){
             return view('trip.searching-show', compact('trip'));
         }
-        $best_ways = $this->service->getBestWays($trip);
+        $best_ways = $this->service->getCheapestWays($trip);
         $transport_classes = [
             'air' => ['class' => 'airplane', 'color' => 'red'],
             'bus' => ['class' => 'buss', 'color' => 'green'],

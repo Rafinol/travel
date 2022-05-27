@@ -12,16 +12,19 @@ class LoadWaysService
 {
     private RouteRepository $repository;
     const LAST_ARRIVAL_TIME = 20;
+    private PartWayService $partWayService;
 
-    public function __construct(RouteRepository $repository)
+    public function __construct(RouteRepository $repository, PartWayService $partWayService)
     {
         $this->repository = $repository;
+        $this->partWayService = $partWayService;
     }
 
     public function load()
     {
         $this->updateArrivalDates();
         $this->updateDepartureDates(); // If previous part_way in table has arrival_time, update departure_time for next part_way
+        $this->initSearchForm();
         $this->updateWayStatuses();
         $this->updateTripStatuses();
     }
@@ -31,10 +34,10 @@ class LoadWaysService
         /*Select part_ways.id, rsf.id FROM part_ways
         JOIN route_search_form rsf on part_ways.route_search_form_id = rsf.id
         WHERE rsf.status = 'done' and part_ways.arrival_date is null*/
-        $part_ways = PartWay::join('route_search_form rsf', 'rsf.id', '=', 'part_ways.route_search_form_id')
-            ->where('rsf.status', RouteSearchForm::DONE_STATUS)
+        $part_ways = PartWay::join('route_search_form', 'route_search_form.id', '=', 'part_ways.route_search_form_id')
+            ->where('route_search_form.status', RouteSearchForm::DONE_STATUS)
             ->whereNull('part_ways.arrival_date')
-            ->get(['part_ways.id as id']);
+            ->get();
         foreach ($part_ways as $part_way){
             $this->updateArrivalDate($part_way);
         }
@@ -49,27 +52,36 @@ class LoadWaysService
 
     public function updateDepartureDates() :void
     {
-        \DB::table('part_ways pw')
-            ->join('part_ways pw2', 'pw.position', '=', 'pw2.position+1')
-            ->where('pw.way_id', 'pw2.way_id')
+        \DB::table('part_ways', 'pw')
+            ->join('part_ways as pw2', 'pw.position', '=', \DB::raw('`pw2`.`position`+1'))
+            ->where('pw.way_id', '=',\DB::raw('pw2.way_id'))
             ->whereNull('pw.departure_date')
             ->whereNotNull('pw2.arrival_date')
             ->update(['pw.departure_date' =>
                 'IF(HOUR(pw2.arrival_date) < '.self::LAST_ARRIVAL_TIME.',
-                    pw2.arrival_date,
-                    DATE_FORMAT(DATE_ADD(pw2.arrival_date, INTERVAL 1 DAY),"%Y-%m-%d 00:00:00")']);
+                    '.\DB::raw('pw2.arrival_date').',
+                    '.\DB::raw('DATE_FORMAT(DATE_ADD(pw2.arrival_date, INTERVAL 1 DAY),"%Y-%m-%d 00:00:00")').')']);
         //If the arrival is before 20:00, then we will take the this day
         //If the arrival is after 20:00, then we will search for tickets the next day
     }
 
+    public function initSearchForm()
+    {
+        $part_ways = PartWay::whereNotNull('departure_date')->whereNull('route_search_form_id')->get();
+        foreach ($part_ways as $part_way){
+            $this->partWayService->prepareForSearch($part_way);
+        }
+    }
+
     public function updateWayStatuses() :void
     {
-        $not_ready_partway_ids = \DB::table('ways w')
-            ->select('w.id')
-            ->join('part_ways pw', 'w.id', '=', 'pw.way_id')
-            ->whereNull('pw.arrival_date')
+        $not_ready_partway_ids = \DB::table('ways')
+            ->select('ways.id')
+            ->join('part_ways', 'ways.id', '=', 'part_ways.way_id')
+            ->whereNull('part_ways.arrival_date')
             ->where('status', '=', WayStatus::WAITING_STATUS)
-            ->get('w.id'); // get way id with not ready partways
+            ->groupBy('ways.id')
+            ->pluck('ways.id')->toArray(); // get way id with not ready partways
         Way::whereNotIn('id', $not_ready_partway_ids)
             ->where('status', '=', WayStatus::WAITING_STATUS)
             ->update(['status' => WayStatus::DONE_STATUS]);

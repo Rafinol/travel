@@ -23,9 +23,8 @@ class BusTripService
 
     public function hasExclusiveRoute(RouteSearchForm $form) :bool
     {
-        foreach ($this->exclusive_bus_pairs as $bus_pair){
-            $bus_pair = reset($bus_pair);
-            if(key($bus_pair) == $form->departure->name && $bus_pair == $form->arrival->name){
+        foreach ($this->exclusive_bus_pairs as $departure => $arrival){
+            if($departure == $form->departure->name && $arrival == $form->arrival->name){
                 return true;
             }
         }

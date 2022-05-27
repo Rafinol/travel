@@ -18,7 +18,7 @@ trait TripTrait
         if(!$route_search) {
             $route_search = RouteSearch::new($route_search_form->id, $this->service->getServiceName());
         }
-        if($route_search->isDone()){
+        if($route_search->isCompleted()){
             return $route_search;
         }
         $search_id = $this->service->search($route_search_form);

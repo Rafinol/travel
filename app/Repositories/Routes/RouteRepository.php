@@ -9,8 +9,7 @@ use App\Models\Way\PartWay;
 
 class RouteRepository
 {
-    const TRANSFER_TIME = 1; //HOUR
-    public function getCheapestRouteByPartWay(PartWay $part_way, int $transfer_time=self::TRANSFER_TIME) :Route|null
+    public function getCheapestRouteByPartWay(PartWay $part_way, int $transfer_time=0) :Route|null
     {
         $part_way->departure_date = $part_way->departure_date->addHours($transfer_time);
         return $this->buildRouteQueryByPartWay($part_way)

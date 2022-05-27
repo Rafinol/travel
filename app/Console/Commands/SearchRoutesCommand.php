@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\City\City;
-use App\UseCases\Trip\SearchRoutesService;
+use App\UseCases\Trip\Route\SearchRoutesService;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 

@@ -3,6 +3,7 @@ namespace App\UseCases\Trip;
 
 use App\Models\City\City;
 use App\Models\Trip\Trip;
+use App\Models\Way\PartWay;
 use App\Repositories\Routes\RouteRepository;
 use App\UseCases\Trip\Way\WayService;
 use Carbon\Carbon;
@@ -11,6 +12,8 @@ class TripService
 {
     private WayService $wayService;
     private RouteRepository $repository;
+
+    const TRANSFER_TIME = 1;
 
     public function __construct(WayService $wayService, RouteRepository $repository)
     {
@@ -58,11 +61,15 @@ class TripService
         return $trip;
     }
 
-    public function getBestWays(Trip $trip) :array
+    public function getCheapestWays(Trip $trip) :array
     {
         $ways = [];
         foreach ($trip->ways as $way){
             foreach ($way->partWays as $part_way){
+                /** @var PartWay $part_way*/
+                if($part_way->position != 0){
+                    $part_way->departure_date = $part_way->departure_date->addHours(self::TRANSFER_TIME);
+                }
                 $route = $this->repository->getCheapestRouteByPartWay($part_way);
                 if(!$route){
                     unset($ways[$way->id]);

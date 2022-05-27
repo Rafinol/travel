@@ -27,6 +27,9 @@ class PartWayService
         if($part_way->isCompleted()){
             return;
         }
+        if(!$part_way->departure_date){
+            return;
+        }
         $this->saveSearchForm($part_way);
     }
 

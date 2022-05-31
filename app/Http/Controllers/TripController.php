@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Request\Trip\TripRequest;
 use App\Jobs\ProccessRoutesSearch;
 use App\Jobs\ProccessWaysInit;
+use App\Models\ProxyDto\ProxyDto;
 use App\Models\Trip\Trip;
 use App\UseCases\Trip\Departure\DepartureService;
 use App\UseCases\Trip\TripService;
@@ -31,16 +32,6 @@ class TripController extends Controller
     public function create(TripRequest $request)
     {
         $trip = $this->service->getPreparedTrip($request->input('from'), $request->input('to'), Carbon::createFromFormat('Y-m-d',$request->input('date')));
-        ProccessRoutesSearch::dispatch();
-        ProccessWaysInit::dispatch();
-        return redirect()->route('trip.show', ['id' => $trip->id]);
-    }
-
-    public function dispatch($id)
-    {
-        $trip = Trip::find($id);
-        ProccessRoutesSearch::dispatch();
-        ProccessWaysInit::dispatch();
         return redirect()->route('trip.show', ['id' => $trip->id]);
     }
 

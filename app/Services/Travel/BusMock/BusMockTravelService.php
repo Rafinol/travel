@@ -26,7 +26,7 @@ class BusMockTravelService implements CommonTravelService, BusRideTravelService
             $ride->arrival_point = $this->getStation($form->arrival);
             $ride->transport_type = TransportType::BUS_TYPE;
             $ride->number = 'bus';
-            $rides[] = new ResultRouteDto(3000, [$ride]);
+            $rides[] = new ResultRouteDto(3000, $ride->departure_date, $ride->arrival_date, [$ride]);
         }
         return $rides;
     }

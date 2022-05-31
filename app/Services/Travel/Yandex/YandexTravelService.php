@@ -5,22 +5,11 @@ namespace App\Services\Travel\Yandex;
 
 
 use App\Exceptions\CityNotFoundException;
-use App\Exceptions\RoutesAlreadyDoneException;
-use App\Exceptions\RoutesNotReadyYetException;
 use App\Models\City\City;
 use App\Models\Route\RouteSearch;
 use App\Models\Route\RouteSearchForm;
-use App\Models\RouteDto\RouteDto;
-use App\Models\RouteDto\ResultRouteDto;
-use App\Models\Point\StationDto;
-use App\Models\Trip\Trip;
-use App\Models\Way\PartWay;
-use App\Models\Way\Way;
 use App\Services\Travel\CommonTravelService;
 use App\Services\Travel\FlightTravelService;
-use Carbon\Carbon;
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Http;
 
 class YandexTravelService implements FlightTravelService, CommonTravelService
@@ -30,6 +19,13 @@ class YandexTravelService implements FlightTravelService, CommonTravelService
     const GET_RESULT_URL = 'https://travel.yandex.ru/api/avia/search/results';
 
     const SERVICE_NAME = 'yandex_travel';
+
+    private Http $http;
+
+    public function __construct(Http $http)
+    {
+        $this->http = $http;
+    }
 
     public function getServiceName() :string
     {
@@ -61,7 +57,7 @@ class YandexTravelService implements FlightTravelService, CommonTravelService
             'oneway' => 1,
             //'proxy' => 'https://PAJWTR:5XYTLV@217.29.63.254:12021'
         ];
-        $result = Http::withHeaders(['proxy' => 'https://PAJWTR:5XYTLV@217.29.63.254:12021'])->get(self::INIT_URL, $body);
+        $result = $this->http::get(self::INIT_URL, $body);
         /*if(!$result->json()){
             sleep(90);
             return $this->createSearch($from, $to, $date);
@@ -88,10 +84,6 @@ class YandexTravelService implements FlightTravelService, CommonTravelService
     public function getRoutes(RouteSearch $route_search): array
     {
         $response = $this->getResults($route_search->search_id);
-        /*if(!$response){
-            sleep(90);
-            return $this->getRoutes($route_search);
-        }*/
         $ya_flights = new YandexFlight($response);
         return $ya_flights->getFlights();
     }

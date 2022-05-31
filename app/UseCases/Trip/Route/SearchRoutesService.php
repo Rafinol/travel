@@ -11,12 +11,15 @@ use App\UseCases\Trip\Type\AviaTripService;
 use App\UseCases\Trip\Type\BusTripService;
 use App\UseCases\Trip\Type\TrainTripService;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 
 class SearchRoutesService
 {
     private BusTripService $bus;
     private TrainTripService $train;
     private AviaTripService $avia;
+
+    const DELAY_BETWEEN_REQUEST = 1; //SECONDS
 
     public function __construct(AviaTripService $avia, TrainTripService $train, BusTripService $bus)
     {
@@ -27,19 +30,27 @@ class SearchRoutesService
 
     public function getOrCreateSearchForm(City $departure, City $arrival, Carbon $date) :RouteSearchForm
     {
-        return RouteSearchForm::firstOrCreate([
+        $form = RouteSearchForm::firstOrCreate([
             'from_id' => $departure->id,
             'to_id' => $arrival->id,
             'departure_date' => $date
         ]);
+        if(!$form->status) {
+            $form->status = RouteSearchForm::CREATED_STATUS;
+            $form->save();
+        }
+        return $form;
     }
 
-    public function search(RouteSearchForm $form) :array
+    public function search(RouteSearchForm $form, int $delay = self::DELAY_BETWEEN_REQUEST) :array
     {
         if($this->bus->hasExclusiveRoute($form)){
-            return $this->bus->getRoutes(new RouteSearch());  // Temporarily use a mock until busService is ready
+            $route_search = new RouteSearch();
+            $route_search->searchForm = $form;
+            return $this->bus->getRoutes($route_search);  // Temporarily use a mock until busService is ready
         }
         $route_search = $this->avia->getOrCreate($form);
+        sleep($delay);
         return $this->avia->getRoutes($route_search);
     }
 }

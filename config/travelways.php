@@ -8,17 +8,17 @@ return [
         ['Saint Petersburg'],
 
         ['Kaliningrad','Gdansk'],// From the point of departure to Kaliningrad, from Kaliningrad to Gdyansk, from Gdyansk to the destination point
-        ['Moscow','Kaliningrad','Gdansk'],// From the point of departure to Moscow, from Moscow to Kaliningrad, from Kaliningrad to Gdyansk, from Gdyansk to the destination point
+        //['Moscow','Kaliningrad','Gdansk'],// From the point of departure to Moscow, from Moscow to Kaliningrad, from Kaliningrad to Gdyansk, from Gdyansk to the destination point
 
         ['Minsk','Vilnius',],
         ['Minsk', 'Riga',],
-        ['Moscow','Minsk','Vilnius'],
-        ['Moscow','Minsk','Riga'],
+        //['Moscow','Minsk','Vilnius'],
+        //['Moscow','Minsk','Riga'],
 
         ['Saint Petersburg','Tallinn'],
         ['Saint Petersburg','Helsinki'],
-        ['Moscow','Saint Petersburg','Tallinn'],
-        ['Moscow','Saint Petersburg','Helsinki'],
+        //['Moscow','Saint Petersburg','Tallinn'],
+        //['Moscow','Saint Petersburg','Helsinki'],
     ],
     'exclusive_bus_pairs' => [ // For these routes, it is better to search for tickets only by bus
         ['Saint Petersburg'=>'Tallinn'],

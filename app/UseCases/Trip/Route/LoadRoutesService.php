@@ -17,12 +17,34 @@ class LoadRoutesService
 
     public function load() :void
     {
-        $forms = RouteSearchForm::waiting()->get();
+        $forms = RouteSearchForm::new()->get();
         foreach ($forms as $form){
-            $routes = $this->searchService->search($form);
-            $routes = RouteDtoCleanerService::getTopRoutes($routes);
-            $this->createService->saveRoutes($form, $routes);
+            $this->loadForm($form);
         }
+    }
+
+    public function loadRandomSearchForm() :void
+    {
+        $form = RouteSearchForm::new()->first();
+        if(!$form){
+            return;
+        }
+        try {
+            $this->loadForm($form);
+        }
+        catch (\Exception $e){
+            $form->changeStatusToFail();
+        }
+
+    }
+
+    public function loadForm(RouteSearchForm $form) :void
+    {
+        $form->changeStatusToSearching();
+        $routes = $this->searchService->search($form, 10);
+        $routes = RouteDtoCleanerService::getTopRoutes($routes);
+        $this->createService->saveRoutes($form, $routes);
+        $form->changeStatusToComplete();
     }
 
 }

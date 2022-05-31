@@ -18,8 +18,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class CreateRoutesService
 {
-    const MAX_TRANSFERS = 3;
-
     /**
      * @param RouteSearchForm $route_form
      * @var ResultRouteDto[] $raw_routes

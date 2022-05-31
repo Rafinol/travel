@@ -6,11 +6,11 @@ use App\Services\Travel\BusMock\BusMockTravelService;
 use App\Services\Travel\BusRideTravelService;
 use App\Services\Travel\FlightTravelService;
 use App\Services\Travel\Yandex\YandexTravelService;
-use App\UseCases\Trip\Departure\DefaultTripService;
-use App\UseCases\Trip\Departure\DepartureService;
-use App\UseCases\Trip\Departure\CustomTripService;
 use App\UseCases\Trip\Type\BusTripService;
 use App\UseCases\Trip\Way\TravelWaysService;
+use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\ServiceProvider;
 
 class TravelServiceProvider extends ServiceProvider

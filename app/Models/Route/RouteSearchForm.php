@@ -43,8 +43,10 @@ class RouteSearchForm extends Model
     protected $fillable = ['from_id', 'to_id', 'departure_date'];
     protected $dates = ['departure_date'];
 
+    const CREATED_STATUS = 'created';
     const WAITING_STATUS = 'waiting';
     const DONE_STATUS = 'done';
+    const FAIL_STATUS = 'fail';
 
     /*public static function new($from_id, $to_id, $departure_date) :self
     {
@@ -74,5 +76,28 @@ class RouteSearchForm extends Model
     public function scopeWaiting(Builder $query)
     {
         return $query->where('status', self::WAITING_STATUS);
+    }
+
+    public function scopeNew(Builder $query)
+    {
+        return $query->where('status', self::CREATED_STATUS);
+    }
+
+    public function changeStatusToSearching() :void
+    {
+        $this->status = self::WAITING_STATUS;
+        $this->save();
+    }
+
+    public function changeStatusToComplete() :void
+    {
+        $this->status = self::DONE_STATUS;
+        $this->save();
+    }
+
+    public function changeStatusToFail() :void
+    {
+        $this->status = self::FAIL_STATUS;
+        $this->save();
     }
 }

@@ -32,7 +32,7 @@ class SearchRoutesCommand extends Command
         $departure = City::where(['name' => $this->argument('from')])->firstOrFail();
         $arrival = City::where(['name' => $this->argument('to')])->firstOrFail();
         $form = $service->getOrCreateSearchForm($departure, $arrival, Carbon::createFromFormat('Y-m-d',$this->argument('date')));
-        $result = $service->search($form);
+        $result = $service->search($form, 20);
         $this->info(json_encode($result));
     }
 }

@@ -2,6 +2,7 @@
 namespace App\UseCases\Trip;
 
 use App\Models\City\City;
+use App\Models\Route\PartRoute;
 use App\Models\Trip\Trip;
 use App\Models\Way\PartWay;
 use App\Repositories\Routes\RouteRepository;
@@ -64,13 +65,28 @@ class TripService
     public function getCheapestWays(Trip $trip) :array
     {
         $ways = [];
+
+        $routes = $this->repository->getCheapestRoutesByTrip($trip);
+        $route_ids = collect($routes)->unique('rid')->pluck('rid')->all();
+
+        $part_routes = PartRoute::with('departure', 'arrival')->whereIn('route_id', $route_ids)->get();
+        $collect_part_routes = collect($part_routes)->groupBy('route_id')->all();
+
+        foreach ($routes as $route){
+            $ways[$route->wid]['details'][] = ['route' => $route, 'part_routes' => $collect_part_routes[$route->rid]];
+            $ways[$route->wid]['price'] = $route->price + ($ways[$route->wid]['price'] ?? 0);
+            $ways[$route->wid]['flights_count'] = $route->transfers_count + ($ways[$route->wid]['flights_count'] ?? 0);
+        }
+
+        return collect($ways)->sortBy('price')->all();
+
+        /*$trip = $trip->load('ways.partWays');
         foreach ($trip->ways as $way){
             foreach ($way->partWays as $part_way){
-                /** @var PartWay $part_way*/
                 if($part_way->position != 0){
                     $part_way->departure_date = $part_way->departure_date->addHours(self::TRANSFER_TIME);
                 }
-                $route = $this->repository->getCheapestRouteByPartWay($part_way);
+                $route = $this->repository->getCheapestRouteByPartWay($part_way, 2);
                 if(!$route){
                     unset($ways[$way->id]);
                     break;
@@ -80,7 +96,7 @@ class TripService
                 $ways[$way->id]['flights_count'] = $route->transfers_count + ($ways[$way->id]['flights_count'] ?? 0);
             }
         }
-        return collect($ways)->sortBy('price')->all();
+        return collect($ways)->sortBy('price')->all();*/
     }
 
 }

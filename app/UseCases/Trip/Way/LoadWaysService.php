@@ -10,8 +10,8 @@ use App\Repositories\Routes\RouteRepository;
 
 class LoadWaysService
 {
-    private RouteRepository $repository;
     const LAST_ARRIVAL_TIME = 20;
+    private RouteRepository $repository;
     private PartWayService $partWayService;
 
     public function __construct(RouteRepository $repository, PartWayService $partWayService)
@@ -37,7 +37,7 @@ class LoadWaysService
         $part_ways = PartWay::join('route_search_form', 'route_search_form.id', '=', 'part_ways.route_search_form_id')
             ->where('route_search_form.status', RouteSearchForm::DONE_STATUS)
             ->whereNull('part_ways.arrival_date')
-            ->get();
+            ->get(['part_ways.*']);
         foreach ($part_ways as $part_way){
             $this->updateArrivalDate($part_way);
         }
@@ -57,10 +57,10 @@ class LoadWaysService
             ->where('pw.way_id', '=',\DB::raw('pw2.way_id'))
             ->whereNull('pw.departure_date')
             ->whereNotNull('pw2.arrival_date')
-            ->update(['pw.departure_date' =>
-                'IF(HOUR(pw2.arrival_date) < '.self::LAST_ARRIVAL_TIME.',
-                    '.\DB::raw('pw2.arrival_date').',
-                    '.\DB::raw('DATE_FORMAT(DATE_ADD(pw2.arrival_date, INTERVAL 1 DAY),"%Y-%m-%d 00:00:00")').')']);
+            ->update(['pw.departure_date' => \DB::raw(
+                "IF(HOUR(pw2.arrival_date) < ".self::LAST_ARRIVAL_TIME.",
+                    pw2.arrival_date,
+                    DATE_FORMAT(DATE_ADD(pw2.arrival_date, INTERVAL 1 DAY),'%Y-%m-%d 00:00:00'))")]);
         //If the arrival is before 20:00, then we will take the this day
         //If the arrival is after 20:00, then we will search for tickets the next day
     }
@@ -89,7 +89,7 @@ class LoadWaysService
 
     public function updateTripStatuses() :void
     {
-        \DB::raw("UPDATE trips t
+        \DB::unprepared("UPDATE trips t
             JOIN
                 (SELECT trip_id FROM (
                     SELECT trip_id
@@ -98,7 +98,7 @@ class LoadWaysService
                     GROUP BY trip_id
                     having count(*) = 1) as w ON t.id = w.trip_id
             SET status = '".Status::DONE_STATUS."'
-            WHERE t.status = '".Status::WAITING_STATUS."'");
+            WHERE t.status = '".Status::SEARCHING_STATUS."'");
         /*$sub_query = \DB::table('ways w')
             ->select('trip_id')
             ->join('trips t', 't.id', '=', 'w.trip_id')

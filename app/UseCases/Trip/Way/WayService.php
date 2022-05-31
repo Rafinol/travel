@@ -41,8 +41,8 @@ class WayService
             return;
         }
         $way->changeStatusToWaiting();
-        foreach ($way->partWays as $part_way){
+        /*foreach ($way->partWays as $part_way){
             $this->partWayService->prepareForSearch($part_way);
-        }
+        }*/
     }
 }

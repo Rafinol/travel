@@ -14,7 +14,7 @@ trait TripTrait
 {
     public function getOrCreate(RouteSearchForm $route_search_form) :RouteSearch
     {
-        $route_search = RouteSearch::where(['type' => $this->service->getServiceName(), 'route_search_form_id' => $route_search_form->id,])->where('created_at', '>', now()->subDay())->first();
+        $route_search = RouteSearch::where(['type' => $this->service->getServiceName(), 'route_search_form_id' => $route_search_form->id,])->where('created_at', '>', now()->subDay())->orderBy('id', 'desc')->first();
         if(!$route_search) {
             $route_search = RouteSearch::new($route_search_form->id, $this->service->getServiceName());
         }

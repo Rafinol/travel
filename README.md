@@ -2,7 +2,7 @@
 Used to find routes between Kazan and wish destination.
 You can use the application for any cities. To do this, edit the `config/travelways.php` file.
 
-###How it works
+### How it works
 There are 2 arrays in the `travelways.php` file: `additional_routes` and `exclusive_bus_pairs`.
 For example, a traveler from Kazan can look for flights not only from his own city, but also take a plane/train/bus to a neighboring city and check routes from them. For these purposes, we use the array `additional_routes`.
 
@@ -25,7 +25,7 @@ To determine which routes will be operated exclusively by the bus, it is necessa
 ]
 ```
 
-###Proxy
+### Proxy
 To speed up the search for routes, you need to use a proxy to run parallel jobs.
 Paste them into the `.env `file. 
 
@@ -35,7 +35,7 @@ PROXY_2 = "login:password@test.com:1253"
 PROXY_3 = "login:password@test.com:1254"
 ```
 
-###Jobs
+### Jobs
 Routes are searched in the background. So, you need to dispatch jobs anytime.
 Start the supervisor by specifying the number of channels equal to the number of your proxies and set up the cron every minute.
 

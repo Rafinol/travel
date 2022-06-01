@@ -17,9 +17,9 @@ class CitiesTableSeeder extends Seeder
     {
         $citiesTable = config('location.cities_table', 'cities');
 
-         Schema::disableForeignKeyConstraints();
+         /*Schema::disableForeignKeyConstraints();
          DB::table($citiesTable)->truncate();
-         Schema::enableForeignKeyConstraints();
+         Schema::enableForeignKeyConstraints();*/
 
         $cities = array(
             array('name' => "Bombuflat",'state_id' => 1),
@@ -1550,7 +1550,9 @@ class CitiesTableSeeder extends Seeder
             array('name' => "Ambikanagara",'state_id' => 17),
             array('name' => "Anekal",'state_id' => 17),
             array('name' => "Ankola",'state_id' => 17),
-            array('name' => "Annigeri",'state_id' => 17),
+            array('name' => "Annigeri",'state_id' => 17),  );
+        DB::table($citiesTable)->insert($cities);
+        $cities = array(
             array('name' => "Arkalgud",'state_id' => 17),
             array('name' => "Arsikere",'state_id' => 17),
             array('name' => "Athni",'state_id' => 17),
@@ -3859,7 +3861,9 @@ class CitiesTableSeeder extends Seeder
             array('name' => "Killiyur",'state_id' => 35),
             array('name' => "Killlai",'state_id' => 35),
             array('name' => "Kilpennathur",'state_id' => 35),
-            array('name' => "Kilvelur",'state_id' => 35),
+            array('name' => "Kilvelur",'state_id' => 35),  );
+        DB::table($citiesTable)->insert($cities);
+        $cities = array(
             array('name' => "Kinathukadavu",'state_id' => 35),
             array('name' => "Kiramangalam",'state_id' => 35),
             array('name' => "Kiranur",'state_id' => 35),
@@ -13841,7 +13845,9 @@ class CitiesTableSeeder extends Seeder
             array('name' => "San Roque",'state_id' => 846),
             array('name' => "San Vicente",'state_id' => 846),
             array('name' => "Santa Barbara",'state_id' => 846),
-            array('name' => "Santa Lucia",'state_id' => 846),
+            array('name' => "Santa Lucia",'state_id' => 846),  );
+        DB::table($citiesTable)->insert($cities);
+        $cities = array(
             array('name' => "Santa Rosa",'state_id' => 846),
             array('name' => "Santiago",'state_id' => 846),
             array('name' => "Santo Domingo",'state_id' => 846),
@@ -21222,7 +21228,9 @@ class CitiesTableSeeder extends Seeder
             array('name' => "Kisujszallas",'state_id' => 1647),
             array('name' => "Kunhegyes",'state_id' => 1647),
             array('name' => "Kunmadaras",'state_id' => 1647),
-            array('name' => "Kunszentmarton",'state_id' => 1647),
+            array('name' => "Kunszentmarton",'state_id' => 1647),  );
+        DB::table($citiesTable)->insert($cities);
+        $cities = array(
             array('name' => "Martfu",'state_id' => 1647),
             array('name' => "Mezotur",'state_id' => 1647),
             array('name' => "Ocsod",'state_id' => 1647),
@@ -28018,6 +28026,9 @@ class CitiesTableSeeder extends Seeder
             array('name' => "Xaltianguis",'state_id' => 2439),
             array('name' => "Xochihuehuetlan",'state_id' => 2439),
             array('name' => "Xochistlahuaca",'state_id' => 2439),
+        );
+        DB::table($citiesTable)->insert($cities);
+        $cities = array(
             array('name' => "Zacualpan",'state_id' => 2439),
             array('name' => "Zihuatanejo",'state_id' => 2439),
             array('name' => "Zirandaro",'state_id' => 2439),
@@ -37298,7 +37309,9 @@ class CitiesTableSeeder extends Seeder
             array('name' => "Severo-Zadonsk",'state_id' => 3063),
             array('name' => "Shchjokino",'state_id' => 3063),
             array('name' => "Skuratovskij",'state_id' => 3063),
-            array('name' => "Sokolniki",'state_id' => 3063),
+            array('name' => "Sokolniki",'state_id' => 3063),  );
+        DB::table($citiesTable)->insert($cities);
+        $cities = array(
             array('name' => "Sovetsk",'state_id' => 3063),
             array('name' => "Suvorov",'state_id' => 3063),
             array('name' => "Tovarkovskij",'state_id' => 3063),
@@ -45220,7 +45233,9 @@ class CitiesTableSeeder extends Seeder
             array('name' => "Flint",'state_id' => 3945),
             array('name' => "Forest Hills",'state_id' => 3945),
             array('name' => "Fowlerville",'state_id' => 3945),
-            array('name' => "Frankenmuth",'state_id' => 3945),
+            array('name' => "Frankenmuth",'state_id' => 3945),  );
+        DB::table($citiesTable)->insert($cities);
+        $cities = array(
             array('name' => "Fraser",'state_id' => 3945),
             array('name' => "Fremont",'state_id' => 3945),
             array('name' => "Fruitport",'state_id' => 3945),

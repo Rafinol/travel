@@ -91,16 +91,16 @@ class LoadWaysService
     {
         \DB::unprepared("UPDATE trips t
             JOIN
-                (SELECT trip_id FROM (
+                (SELECT trip_id, status FROM (
                     SELECT trip_id, status
                     FROM ways
                     GROUP BY trip_id, status) as w
-                    WHERE status = '".WayStatus::DONE_STATUS."'
                     GROUP BY trip_id
                     having count(*) = 1
                 ) as w ON t.id = w.trip_id
             SET status = '".Status::DONE_STATUS."'
-            WHERE t.status = '".Status::SEARCHING_STATUS."'");
+            WHERE t.status = '".Status::SEARCHING_STATUS."' and w.status='".WayStatus::DONE_STATUS."'");
+        //SET status = IF(w.status = 'waiting', 'searching', 'waiting')
         /*$sub_query = \DB::table('ways w')
             ->select('trip_id')
             ->join('trips t', 't.id', '=', 'w.trip_id')

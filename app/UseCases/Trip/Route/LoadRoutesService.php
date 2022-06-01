@@ -33,6 +33,7 @@ class LoadRoutesService
             $this->loadForm($form);
         }
         catch (\Exception $e){
+            \Log::error($e->getMessage());
             $form->changeStatusToFail();
         }
 

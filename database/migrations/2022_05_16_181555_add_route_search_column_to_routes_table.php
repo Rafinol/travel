@@ -16,6 +16,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('routes', function (Blueprint $table) {
+            $table->dropForeign(['part_way_id']);
             $table->dropColumn('part_way_id');
             $table->foreignIdFor(RouteSearchForm::class);
         });

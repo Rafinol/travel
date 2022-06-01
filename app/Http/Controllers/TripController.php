@@ -7,6 +7,7 @@ use App\Jobs\ProccessRoutesSearch;
 use App\Jobs\ProccessWaysInit;
 use App\Models\ProxyDto\ProxyDto;
 use App\Models\Trip\Trip;
+use App\UseCases\JobsKernelService;
 use App\UseCases\Trip\Departure\DepartureService;
 use App\UseCases\Trip\TripService;
 use Carbon\Carbon;
@@ -18,10 +19,12 @@ use MenaraSolutions\Geographer\Earth;
 class TripController extends Controller
 {
     private TripService $service;
+    private JobsKernelService $kernelService;
 
-    public function __construct(TripService $service)
+    public function __construct(TripService $service, JobsKernelService $kernelService)
     {
         $this->service = $service;
+        $this->kernelService = $kernelService;
     }
 
     public function index()
@@ -32,6 +35,7 @@ class TripController extends Controller
     public function create(TripRequest $request)
     {
         $trip = $this->service->getPreparedTrip($request->input('from'), $request->input('to'), Carbon::createFromFormat('Y-m-d',$request->input('date')));
+        $this->kernelService->loopDispatch();
         return redirect()->route('trip.show', ['id' => $trip->id]);
     }
 

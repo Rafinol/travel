@@ -36,6 +36,15 @@ services:
             MYSQL_ALLOW_EMPTY_PASSWORD: 1
         volumes:
             - 'sail-mysql:/var/lib/mysql'
+        #command:
+        #    - "--innodb_buffer_pool_size=5M"
+        #    - "--innodb_log_buffer_size=256K"
+        #    - "--max_connections=10"
+        #    - "--key_buffer_size=8"
+        #    - "--thread_cache_size=0"
+        #    - "--host_cache_size=0"
+        #    - "--innodb_ft_cache_size=1600000"
+        #    - "--innodb_ft_total_cache_size=32000000"
         networks:
             - sail
         healthcheck:

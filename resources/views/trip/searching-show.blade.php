@@ -6,5 +6,5 @@
 @section('header', $trip->departure->name.' - '.$trip->arrival->name.', '.$trip->departure_date->format('d-m-y'))
 
 @section('content')
-    Trip is searching. Please try to refresh this page later.
+    Trip is searching. Please try to refresh this page later. Usually it takes 1-3 minutes.
 @endsection

@@ -22,15 +22,16 @@ class JobsKernelService
 
     public function loopDispatch()
     {
+        /***@var ProxyDto $proxy**/
         $proxies = ProxyDto::getAll();
         array_unshift($proxies, null);
         $count_pending = $this->jobs->countPending();
         for ($i = $count_pending; $i < self::MAX_QUEUE_COUNT; $i=$i+count($proxies)){
-            /**@var ProxyDto $proxy*/
+
             foreach ($proxies as $key => $proxy){
                 ProccessRoutesAndWaysSearch::dispatch($proxy)->delay($i+$key);
             }
-        }
+         }
     }
 
 

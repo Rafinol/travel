@@ -10,5 +10,6 @@ class Status
     const WAITING_STATUS = 'waiting';
     const SEARCHING_STATUS = 'searching';
     const DONE_STATUS = 'done';
+    const TEMP_STATUS = 'temp';
 
 }

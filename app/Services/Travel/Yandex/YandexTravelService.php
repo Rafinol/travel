@@ -55,13 +55,8 @@ class YandexTravelService implements FlightTravelService, CommonTravelService
             'infant_seats' => 0,
             'klass' => 'economy',
             'oneway' => 1,
-            //'proxy' => 'https://PAJWTR:5XYTLV@217.29.63.254:12021'
         ];
         $result = $this->http::get(self::INIT_URL, $body);
-        /*if(!$result->json()){
-            sleep(90);
-            return $this->createSearch($from, $to, $date);
-        }*/
         return $result['id'];
     }
 

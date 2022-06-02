@@ -26,7 +26,6 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // $schedule->command('inspire')->hourly();
-
         /**@var JobsKernelService $job_service*/
         $job_service = \App::make(JobsKernelService::class);
         $job_service->loopDispatch();

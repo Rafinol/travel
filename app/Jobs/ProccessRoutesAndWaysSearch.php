@@ -18,9 +18,6 @@ use Illuminate\Support\Facades\Http;
 class ProccessRoutesAndWaysSearch  implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
-    private Trip $trip;
-
     /**
      * The number of seconds the job can run before timing out.
      *

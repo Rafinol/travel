@@ -90,27 +90,14 @@ class LoadWaysService
     public function updateTripStatuses() :void
     {
         \DB::unprepared("UPDATE trips t
-            JOIN
-                (SELECT trip_id, status FROM (
-                    SELECT trip_id, status
-                    FROM ways
-                    GROUP BY trip_id, status) as w
-                    GROUP BY trip_id
-                    having count(*) = 1
-                ) as w ON t.id = w.trip_id
-            SET status = '".Status::DONE_STATUS."'
-            WHERE t.status = '".Status::SEARCHING_STATUS."' and w.status='".WayStatus::DONE_STATUS."'");
-        //SET status = IF(w.status = 'waiting', 'searching', 'waiting')
-        /*$sub_query = \DB::table('ways w')
-            ->select('trip_id')
-            ->join('trips t', 't.id', '=', 'w.trip_id')
-            ->where('t.status', Status::WAITING_STATUS)
-            ->groupBy(['w.trip_id', 'w.status']);
-
-        \DB::table($sub_query)
-            ->select('trip_id')
-            ->groupBy('trip_id')
-            ->having('count(*)', 1);*/
-
+                                    JOIN (
+                                        SELECT ways.trip_id, done_count, count(*) as all_count FROM ways
+                                        JOIN (SELECT trip_id, count(*) as done_count FROM ways
+                                              WHERE status = '".Status::DONE_STATUS."'
+                                              GROUP BY trip_id, status) as done_ways ON done_ways.trip_id = ways.trip_id
+                                        GROUP BY ways.trip_id
+                                    ) as counts ON t.id = counts.trip_id
+                                SET t.status = '".Status::TEMP_STATUS."'
+                                WHERE t.status = '".Status::SEARCHING_STATUS."' and counts.done_count = counts.all_count");
     }
 }

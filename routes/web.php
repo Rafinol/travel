@@ -16,10 +16,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('trip.index');
-    return view('welcome');
 });
+Route::prefix('trip')->group(function(){
 
-Route::get('/trip/index', [TripController::class, 'index']);
-Route::get('/trip/show/{id}', [TripController::class, 'show'])->name('trip.show');
-Route::post('/trip/create', [TripController::class, 'create'])->name('trip.create');
-Route::get('/trip/dispatch/{id}', [TripController::class, 'dispatch'])->name('trip.dispatch');
+    Route::get('index', [TripController::class, 'index']);
+    Route::get('show/{id}', [TripController::class, 'show'])->name('trip.show');
+    Route::post('create', [TripController::class, 'create'])->name('trip.create');
+});

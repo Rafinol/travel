@@ -4,7 +4,7 @@ namespace App\Console;
 
 use App\Jobs\ProccessRoutesSearch;
 use App\Jobs\ProccessWaysInit;
-use App\Models\ProxyDto\ProxyDto;
+use App\Dto\ProxyDto\ProxyDto;
 use App\Services\Travel\Yandex\YandexTravelService;
 use App\UseCases\JobsKernelService;
 use Illuminate\Console\Scheduling\Schedule;

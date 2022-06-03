@@ -4,15 +4,15 @@
 namespace App\UseCases\Trip\Route;
 
 
-use App\Models\Point\Point;
-use App\Models\Point\PointType;
-use App\Models\Point\StationDto;
+use App\Dto\RouteDto\Point;
+use App\Dto\RouteDto\PointType;
+use App\Dto\RouteDto\StationDto;
 use App\Models\Route\PartRoute;
 use App\Models\Route\Route;
 use App\Models\Route\RouteSearchForm;
 use App\Models\Route\RouteType;
-use App\Models\RouteDto\ResultRouteDto;
-use App\Models\RouteDto\RouteDto;
+use App\Dto\RouteDto\ResultRouteDto;
+use App\Dto\RouteDto\RouteDto;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 

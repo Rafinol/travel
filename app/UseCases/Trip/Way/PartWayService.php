@@ -38,7 +38,11 @@ class PartWayService
         if($part_way->route_search_form_id){
             return;
         }
-        $route_search_form = $this->routesSearchService->getOrCreateSearchForm($part_way->departure, $part_way->arrival, $part_way->departure_date);
+        $route_search_form = $this->routesSearchService
+            ->getOrCreateSearchForm(
+                $part_way->departure,
+                $part_way->arrival,
+                $part_way->departure_date);
         $part_way->route_search_form_id = $route_search_form->id;
         $part_way->save();
     }

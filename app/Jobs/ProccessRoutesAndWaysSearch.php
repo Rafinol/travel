@@ -4,7 +4,7 @@
 namespace App\Jobs;
 
 
-use App\Models\ProxyDto\ProxyDto;
+use App\Dto\ProxyDto\ProxyDto;
 use App\Models\Trip\Trip;
 use App\UseCases\Trip\Route\LoadRoutesService;
 use App\UseCases\Trip\Way\LoadWaysService;

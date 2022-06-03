@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Models\Point;
+namespace App\Dto\RouteDto;
 
 
 class StationDto

@@ -2,12 +2,12 @@
 namespace App\Services\Travel\BusMock;
 
 use App\Models\City\City;
-use App\Models\Point\PointType;
-use App\Models\Point\StationDto;
+use App\Dto\RouteDto\PointType;
+use App\Dto\RouteDto\StationDto;
 use App\Models\Route\RouteSearch;
 use App\Models\Route\RouteSearchForm;
-use App\Models\RouteDto\ResultRouteDto;
-use App\Models\RouteDto\RouteDto;
+use App\Dto\RouteDto\ResultRouteDto;
+use App\Dto\RouteDto\RouteDto;
 use App\Models\Transport\TransportType;
 use App\Services\Travel\BusRideTravelService;
 use App\Services\Travel\CommonTravelService;
@@ -26,7 +26,12 @@ class BusMockTravelService implements CommonTravelService, BusRideTravelService
             $ride->arrival_point = $this->getStation($form->arrival);
             $ride->transport_type = TransportType::BUS_TYPE;
             $ride->number = 'bus';
-            $rides[] = new ResultRouteDto(3000, $ride->departure_date, $ride->arrival_date, [$ride]);
+            $rides[] = new ResultRouteDto(
+                3000,
+                $ride->departure_date,
+                $ride->arrival_date,
+                [$ride]
+            );
         }
         return $rides;
     }

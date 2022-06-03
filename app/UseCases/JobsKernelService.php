@@ -7,7 +7,7 @@ namespace App\UseCases;
 use App\Jobs\ProccessRoutesAndWaysSearch;
 use App\Jobs\ProccessRoutesSearch;
 use App\Jobs\ProccessWaysInit;
-use App\Models\ProxyDto\ProxyDto;
+use App\Dto\ProxyDto\ProxyDto;
 use Laravel\Horizon\Contracts\JobRepository;
 
 class JobsKernelService
@@ -27,7 +27,6 @@ class JobsKernelService
         array_unshift($proxies, null);
         $count_pending = $this->jobs->countPending();
         for ($i = $count_pending; $i < self::MAX_QUEUE_COUNT; $i=$i+count($proxies)){
-
             foreach ($proxies as $key => $proxy){
                 ProccessRoutesAndWaysSearch::dispatch($proxy)->delay($i+$key);
             }

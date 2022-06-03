@@ -2,7 +2,7 @@
 
 namespace Database\Factories\Point;
 
-use App\Models\Point\PointType;
+use App\Dto\RouteDto\PointType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**

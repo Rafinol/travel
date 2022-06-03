@@ -30,20 +30,6 @@ class City extends Model
 {
     use HasFactory;
 
-    public static function getRandomCity() :City
-    {
-        return self::inRandomOrder()->first();
-    }
-
-    public static function getRandomCityExceptFor(int $except_id) :City
-    {
-        $point = self::inRandomOrder();
-        if($except_id){
-            $point->whereNotIn('id', [$except_id]);
-        }
-        return $point->first();
-    }
-
     public function updateForeignId(string $sid) :self
     {
         $this->yandex_id = $sid;

@@ -1,8 +1,8 @@
 <?php
-namespace App\Models\RouteDto;
+namespace App\Dto\RouteDto;
 
-use App\Models\Point\Point;
-use App\Models\Point\StationDto;
+use App\Dto\RouteDto\Point;
+use App\Dto\RouteDto\StationDto;
 use Carbon\Carbon;
 
 class RouteDto

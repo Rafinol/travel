@@ -9,6 +9,8 @@ class LoadRoutesService
     private SearchRoutesService $searchService;
     private CreateRoutesService $createService;
 
+    const WAITING_TIME = 10;
+
     public function __construct(SearchRoutesService $searchService, CreateRoutesService $createService)
     {
         $this->searchService = $searchService;
@@ -42,7 +44,7 @@ class LoadRoutesService
     public function loadForm(RouteSearchForm $form) :void
     {
         $form->changeStatusToSearching();
-        $routes = $this->searchService->search($form, 10);
+        $routes = $this->searchService->search($form, self::WAITING_TIME);
         $routes = RouteDtoCleanerService::getTopRoutes($routes);
         $this->createService->saveRoutes($form, $routes);
         $form->changeStatusToComplete();

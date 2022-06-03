@@ -2,7 +2,7 @@
 
 namespace Database\Factories\Route;
 
-use App\Models\Point\Point;
+use App\Dto\RouteDto\Point;
 use App\Models\Route\RouteType;
 use App\Models\Transport\TransportType;
 use App\Models\Way\Way;

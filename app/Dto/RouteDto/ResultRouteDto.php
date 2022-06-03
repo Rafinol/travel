@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Models\RouteDto;
+namespace App\Dto\RouteDto;
 
 
 use Carbon\Carbon;

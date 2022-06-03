@@ -55,7 +55,11 @@ class TripService
 
     private function getOrCreateTrip(City $departure_city, City $arrival_city, Carbon $date) :Trip
     {
-        $trip = Trip::where(['departure_date' => $date, 'from_id' => $departure_city->id, 'to_id' => $arrival_city->id])->first();
+        $trip = Trip::where([
+            'departure_date' => $date,
+            'from_id' => $departure_city->id,
+            'to_id' => $arrival_city->id
+        ])->first();
         if(!$trip){
             $trip = Trip::new($departure_city->id, $arrival_city->id, $date->startOfDay());
         }
@@ -73,30 +77,15 @@ class TripService
         $collect_part_routes = collect($part_routes)->groupBy('route_id')->all();
 
         foreach ($routes as $route){
-            $ways[$route->wid]['details'][] = ['route' => $route, 'part_routes' => $collect_part_routes[$route->rid]];
+            $ways[$route->wid]['details'][] = [
+                'route' => $route,
+                'part_routes' => $collect_part_routes[$route->rid]
+            ];
             $ways[$route->wid]['price'] = $route->price + ($ways[$route->wid]['price'] ?? 0);
             $ways[$route->wid]['flights_count'] = $route->transfers_count + ($ways[$route->wid]['flights_count'] ?? 0);
         }
 
         return collect($ways)->sortBy('price')->all();
-
-        /*$trip = $trip->load('ways.partWays');
-        foreach ($trip->ways as $way){
-            foreach ($way->partWays as $part_way){
-                if($part_way->position != 0){
-                    $part_way->departure_date = $part_way->departure_date->addHours(self::TRANSFER_TIME);
-                }
-                $route = $this->repository->getCheapestRouteByPartWay($part_way, 2);
-                if(!$route){
-                    unset($ways[$way->id]);
-                    break;
-                }
-                $ways[$way->id]['details'][] = ['part_way' => $part_way, 'route' => $route];
-                $ways[$way->id]['price'] = $route->price + ($ways[$way->id]['price'] ?? 0);
-                $ways[$way->id]['flights_count'] = $route->transfers_count + ($ways[$way->id]['flights_count'] ?? 0);
-            }
-        }
-        return collect($ways)->sortBy('price')->all();*/
     }
 
 }

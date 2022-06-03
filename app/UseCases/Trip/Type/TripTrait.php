@@ -14,15 +14,28 @@ trait TripTrait
 {
     public function getOrCreate(RouteSearchForm $route_search_form) :RouteSearch
     {
-        $route_search = RouteSearch::where(['type' => $this->service->getServiceName(), 'route_search_form_id' => $route_search_form->id,])->where('created_at', '>', now()->subDay())->orderBy('id', 'desc')->first();
+        $route_search = RouteSearch::where([
+            'type' => $this->service->getServiceName(),
+            'route_search_form_id' => $route_search_form->id,
+            ])
+            ->where('created_at', '>', now()->subDay())
+            ->orderBy('id', 'desc')
+            ->first();
+
         if(!$route_search) {
-            $route_search = RouteSearch::new($route_search_form->id, $this->service->getServiceName());
+            $route_search = RouteSearch::new(
+                $route_search_form->id,
+                $this->service->getServiceName()
+            );
         }
         if($route_search->isCompleted()){
             return $route_search;
         }
         $search_id = $this->service->search($route_search_form);
-        $route_search->update(['search_id'=> $search_id, 'status' => RouteSearchStatus::DONE_STATUS]);
+        $route_search->update([
+            'search_id'=> $search_id,
+            'status' => RouteSearchStatus::DONE_STATUS
+        ]);
         return $route_search;
     }
 
@@ -33,7 +46,11 @@ trait TripTrait
 
     public function changeRouteSearchStatusToDone(RouteSearchForm $route_search_form) :void
     {
-        $route_search = RouteSearch::where(['type' => $this->service->getServiceName(), 'route_search_form_id' => $route_search_form->id,])->first();
+        $route_search = RouteSearch::where([
+            'type' => $this->service->getServiceName(),
+            'route_search_form_id' => $route_search_form->id,
+        ])
+        ->first();
         $route_search->changeStatusToDone();
     }
 

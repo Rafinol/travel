@@ -4,7 +4,7 @@
 namespace App\UseCases\Trip;
 
 
-use App\Models\RouteDto\ResultRouteDto;
+use App\Dto\RouteDto\ResultRouteDto;
 
 class RouteDtoCleanerService
 {

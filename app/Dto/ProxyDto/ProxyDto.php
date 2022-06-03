@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Models\ProxyDto;
+namespace App\Dto\ProxyDto;
 
 
 class ProxyDto
@@ -22,7 +22,11 @@ class ProxyDto
         $proxies = [];
         $raw_proxies = config('proxies');
         foreach ($raw_proxies as $raw_proxy){
-            $proxies[] = new self($raw_proxy['host'], $raw_proxy['username'], $raw_proxy['password']);
+            $proxies[] = new self(
+                $raw_proxy['host'],
+                $raw_proxy['username'],
+                $raw_proxy['password']
+            );
         }
         return $proxies;
     }

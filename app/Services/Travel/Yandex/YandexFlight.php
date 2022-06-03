@@ -2,10 +2,10 @@
 namespace App\Services\Travel\Yandex;
 
 
-use App\Models\Point\PointType;
-use App\Models\RouteDto\RouteDto;
-use App\Models\RouteDto\ResultRouteDto;
-use App\Models\Point\StationDto;
+use App\Dto\RouteDto\PointType;
+use App\Dto\RouteDto\RouteDto;
+use App\Dto\RouteDto\ResultRouteDto;
+use App\Dto\RouteDto\StationDto;
 use App\Models\Transport\TransportType;
 use Carbon\Carbon;
 use JetBrains\PhpStorm\Pure;
@@ -18,10 +18,15 @@ class YandexFlight
 
     public function __construct(array $response)
     {
-        $this->flights = collect($response['reference']['flights'])->keyBy('key')->all();
-        $this->stations = collect($response['reference']['stations'])->keyBy('id')->all();
-        $this->fares = collect($response['variants']['fares'])->sortBy(function ($value, $key){
-            return $this->getMinFlightPrice($value['prices']);
+        $this->flights = collect($response['reference']['flights'])
+            ->keyBy('key')
+            ->all();
+        $this->stations = collect($response['reference']['stations'])
+            ->keyBy('id')
+            ->all();
+        $this->fares = collect($response['variants']['fares'])
+            ->sortBy(function ($value, $key){
+                return $this->getMinFlightPrice($value['prices']);
         })->all();
     }
 

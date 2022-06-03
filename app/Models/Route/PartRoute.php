@@ -2,7 +2,7 @@
 
 namespace App\Models\Route;
 
-use App\Models\Point\Point;
+use App\Dto\RouteDto\Point;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

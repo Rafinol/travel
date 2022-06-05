@@ -2,7 +2,7 @@
 
 namespace Database\Factories\Point;
 
-use App\Dto\RouteDto\PointType;
+use App\Dto\RouteDto\PointTypeDto;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +17,7 @@ class PointFactory extends Factory
      */
     public function definition()
     {
-        $point_types = PointType::getTypes();
+        $point_types = PointTypeDto::getTypes();
         return [
             'name' => $this->faker->city,
             'type' => $point_types[$this->faker->numberBetween(0, max($point_types))],

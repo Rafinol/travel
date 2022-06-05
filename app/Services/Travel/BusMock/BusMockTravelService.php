@@ -2,7 +2,7 @@
 namespace App\Services\Travel\BusMock;
 
 use App\Models\City\City;
-use App\Dto\RouteDto\PointType;
+use App\Dto\RouteDto\PointTypeDto;
 use App\Dto\RouteDto\StationDto;
 use App\Models\Route\RouteSearch;
 use App\Models\Route\RouteSearchForm;
@@ -41,7 +41,7 @@ class BusMockTravelService implements CommonTravelService, BusRideTravelService
         return new StationDto(
             str_replace(" ", '', $city->name),
             $city->name,
-            PointType::BUS_TYPE
+            PointTypeDto::BUS_TYPE
         );
     }
 

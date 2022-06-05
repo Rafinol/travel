@@ -4,8 +4,6 @@
 namespace App\UseCases\Trip\Route;
 
 
-use App\Dto\RouteDto\Point;
-use App\Dto\RouteDto\PointType;
 use App\Dto\RouteDto\StationDto;
 use App\Models\Route\PartRoute;
 use App\Models\Route\Route;
@@ -13,8 +11,7 @@ use App\Models\Route\RouteSearchForm;
 use App\Models\Route\RouteType;
 use App\Dto\RouteDto\ResultRouteDto;
 use App\Dto\RouteDto\RouteDto;
-use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Point\Point;
 
 class CreateRoutesService
 {

@@ -1,7 +1,7 @@
 <?php
 namespace App\Dto\RouteDto;
 
-class PointType
+class PointTypeDto
 {
     const BUS_TYPE = 'bus_station';
     const AIR_TYPE = 'airport';

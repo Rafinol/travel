@@ -2,7 +2,7 @@
 namespace App\Services\Travel\Yandex;
 
 
-use App\Dto\RouteDto\PointType;
+use App\Dto\RouteDto\PointTypeDto;
 use App\Dto\RouteDto\RouteDto;
 use App\Dto\RouteDto\ResultRouteDto;
 use App\Dto\RouteDto\StationDto;
@@ -63,7 +63,7 @@ class YandexFlight
     #[Pure] private function getStation($id) :StationDto
     {
         $station = $this->stations[$id];
-        return new StationDto($station['code'], $station['title'], PointType::AIR_TYPE);
+        return new StationDto($station['code'], $station['title'], PointTypeDto::AIR_TYPE);
     }
 
     private function getMinFlightPrice(array $values) :int
